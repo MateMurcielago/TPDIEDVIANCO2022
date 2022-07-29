@@ -1,19 +1,28 @@
 package tp.clases;
 
 public class Superior extends Linea {
-	private Servicio servicio; //Entiendo que no puede ofrecer los dos simultaneamente
+	private boolean wifi;
+	private boolean aireAcondicionado;
 	
-	public Superior(String nombre, String color, int maxPasajerosSentados, Servicio servicio) {
+	public Superior(String nombre, String color, int maxPasajerosSentados, boolean wifi, boolean aire) {
 		super(nombre, color, maxPasajerosSentados);
-		this.setServicio(servicio);
+		this.setWifi(wifi);
+		this.setAireAcondicionado(aire);
 	}
 
-	public Servicio getServicio() {
-		return servicio;
+	public boolean isWifi() {
+		return wifi;
 	}
 
-	public void setServicio(Servicio servicio) {
-		this.servicio = servicio;
+	public void setWifi(boolean wifi) {
+		this.wifi = wifi;
 	}
-	
+
+	public boolean isAireAcondicionado() {
+		return aireAcondicionado;
+	}
+
+	public void setAireAcondicionado(boolean aireAcondicionado) {
+		this.aireAcondicionado = aireAcondicionado;
+	}
 }
