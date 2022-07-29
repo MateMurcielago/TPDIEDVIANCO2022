@@ -7,6 +7,7 @@ public abstract class Linea {
 	private String color;
 	private int maxPasajerosSentados;
 	private ArrayList<Parada> paradas;
+	private ArrayList<Trayecto> recorrido;
 	
 	public Linea(String nombre, String color, int maxPasajerosSentados) {
 		super();
@@ -14,6 +15,7 @@ public abstract class Linea {
 		this.setColor(color);
 		this.setMaxPasajerosSentados(maxPasajerosSentados);
 		this.paradas = new ArrayList<Parada>();
+		this.recorrido = new ArrayList<Trayecto>();
 	}
 
 	public String getNombre() {
@@ -48,4 +50,15 @@ public abstract class Linea {
 		this.paradas.add(p);
 	}
 	
+	public ArrayList<Trayecto> getRecorrido() {
+		return this.recorrido;
+	}
+	
+	public void addTrayecto(Trayecto t) {
+		this.recorrido.add(t);
+	}
+	
+	public void addTrayecto(Camino c, int duracion) {
+		this.recorrido.add(new Trayecto(c, duracion));
+	}
 }
