@@ -12,4 +12,8 @@ public class Grafo {
 		this.caminos = new ArrayList<Camino>();
 		this.paradas = new ArrayList<Parada>();
 	}
+	
+	public void addParada(Parada p) {
+		this.paradas.add(p);
+	}
 }

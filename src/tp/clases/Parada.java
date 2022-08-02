@@ -1,15 +1,25 @@
 package tp.clases;
 
 public class Parada {
+	private int id;
 	private int nroParada;
 	private String calle;
 	private int nroCalle;
 	
-	public Parada(int nroParada, String calle, int nroCalle) {
+	public Parada(int id, int nroParada, String calle, int nroCalle) {
 		super();
+		this.setId(id);
 		this.setNroParada(nroParada);
 		this.setCalle(calle);
 		this.setNroCalle(nroCalle);
+	}
+	
+	public int getId() {
+		return this.id;
+	}
+	
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public int getNroParada() {

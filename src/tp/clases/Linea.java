@@ -3,19 +3,29 @@ package tp.clases;
 import java.util.ArrayList;
 
 public abstract class Linea {
+	private int id;
 	private String nombre;
 	private String color;
 	private int maxPasajerosSentados;
 	private ArrayList<Parada> paradas;
 	private ArrayList<Trayecto> recorrido;
 	
-	public Linea(String nombre, String color, int maxPasajerosSentados) {
+	public Linea(int id, String nombre, String color, int maxPasajerosSentados) {
 		super();
+		this.setId(id);
 		this.setNombre(nombre);
 		this.setColor(color);
 		this.setMaxPasajerosSentados(maxPasajerosSentados);
 		this.paradas = new ArrayList<Parada>();
 		this.recorrido = new ArrayList<Trayecto>();
+	}
+	
+	public int getId() {
+		return this.id;
+	}
+	
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public String getNombre() {
@@ -58,7 +68,7 @@ public abstract class Linea {
 		this.recorrido.add(t);
 	}
 	
-	public void addTrayecto(Camino c, int duracion) {
-		this.recorrido.add(new Trayecto(c, duracion));
+	public void addTrayecto(int id, Camino c, int duracion) {
+		this.recorrido.add(new Trayecto(id, c, duracion));
 	}
 }

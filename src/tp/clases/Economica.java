@@ -3,14 +3,14 @@ package tp.clases;
 public class Economica extends Linea {
 	private int maxPasajerosParados;
 	
-	public Economica(String nombre, String color, int maxPasajerosSentados) {
-		super(nombre, color, maxPasajerosSentados);
+	public Economica(int id, String nombre, String color, int maxPasajerosSentados) {
+		super(id, nombre, color, maxPasajerosSentados);
 		this.maxPasajerosParados = ((maxPasajerosSentados * 40)/100);
 	}
 	
-	public Economica(String nombre, String color, int maxPasajerosSentados, 
+	public Economica(int id, String nombre, String color, int maxPasajerosSentados, 
 			int maxPasajerosParados) {
-		super(nombre, color, maxPasajerosSentados);
+		super(id, nombre, color, maxPasajerosSentados);
 		this.setMaxPasajerosSentados(maxPasajerosSentados);
 	}
 

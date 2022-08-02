@@ -3,9 +3,10 @@ package tp.clases;
 import java.util.ArrayList;
 
 public class Camino {
+	private int id;
 	private Parada origen;
 	private Parada destino;
-	private int distancia;
+	private float distancia;
 	private ArrayList<Incidencia> incidencias;
 	
 	public Camino() {
@@ -13,12 +14,21 @@ public class Camino {
 		this.distancia = 0;
 	}
 	
-	public Camino(Parada origen, Parada destino, int distancia) {
+	public Camino(int id, Parada origen, Parada destino, float distancia) {
 		super();
+		this.setId(id);
 		this.setOrigen(origen);
 		this.setDestino(destino);
 		this.setDistancia(distancia);
 		this.incidencias = new ArrayList<Incidencia>();
+	}
+	
+	public int getId() {
+		return this.id;
+	}
+	
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public Parada getOrigen() {
@@ -37,11 +47,11 @@ public class Camino {
 		this.destino = destino;
 	}
 
-	public int getDistancia() {
+	public float getDistancia() {
 		return distancia;
 	}
 
-	public void setDistancia(int distancia) {
+	public void setDistancia(float distancia) {
 		this.distancia = distancia;
 	}
 	

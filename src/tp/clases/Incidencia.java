@@ -3,19 +3,29 @@ package tp.clases;
 import java.time.LocalDate;
 
 public class Incidencia {
+	private int id;
 	private LocalDate inicio;
 	private LocalDate fin;
 	private String descripcion;
 	
-	public Incidencia(LocalDate inicio, String descripcion) {
+	public Incidencia(int id, LocalDate inicio, String descripcion) {
 		super();
+		this.setId(id);
 		this.setInicio(inicio);
 		this.setDescripcion(descripcion);
 	}
 	
-	public Incidencia(LocalDate inicio, LocalDate fin, String descripcion) {
-		this(inicio, descripcion);
+	public Incidencia(int id, LocalDate inicio, LocalDate fin, String descripcion) {
+		this(id, inicio, descripcion);
 		this.setFin(fin);
+	}
+	
+	public int getId() {
+		return this.id;
+	}
+	
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public LocalDate getInicio() {

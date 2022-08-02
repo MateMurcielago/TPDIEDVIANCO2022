@@ -4,8 +4,8 @@ public class Superior extends Linea {
 	private boolean wifi;
 	private boolean aireAcondicionado;
 	
-	public Superior(String nombre, String color, int maxPasajerosSentados, boolean wifi, boolean aire) {
-		super(nombre, color, maxPasajerosSentados);
+	public Superior(int id, String nombre, String color, int maxPasajerosSentados, boolean wifi, boolean aire) {
+		super(id, nombre, color, maxPasajerosSentados);
 		this.setWifi(wifi);
 		this.setAireAcondicionado(aire);
 	}
