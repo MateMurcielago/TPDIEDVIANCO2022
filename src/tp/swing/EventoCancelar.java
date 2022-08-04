@@ -12,8 +12,16 @@ public class EventoCancelar implements ActionListener {
 		this.ventana = ventana;
 	}
 	
+	public EventoCancelar() {
+		super();
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		this.ventana.dispose();
+	}
+	
+	public void configurar(JFrame ventana) {
+		this.ventana = ventana;
 	}
 }

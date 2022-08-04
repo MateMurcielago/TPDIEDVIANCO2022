@@ -20,7 +20,16 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 public class ScreensManager {
+	//Fuente de menú
 	private static Font fuente = new Font("Audiowide", Font.PLAIN, 18);
+	
+	//Eventos
+	private static EventoBotonLineasPulsado eventoBotonLineasPulsado = 
+			new EventoBotonLineasPulsado();
+	private static EventoCancelar eventoCancelar = new EventoCancelar();
+	private static EventoGuardarLinea eventoGuardarLinea = new EventoGuardarLinea();
+	private static EventoNuevaLinea eventoNuevaLinea = new EventoNuevaLinea();
+	private static EventoVerLineas eventoVerLineas = new EventoVerLineas();
 	
 	public static void PantallaPrincipal() {
 		JFrame ventana = new JFrame("Gestión de Transporte");
@@ -33,7 +42,7 @@ public class ScreensManager {
 		+"Sistema de Gestión de Transporte Público</div></html>"
 				, SwingConstants.CENTER);
 		texto.setFont(fuente);
-		lineas.addActionListener(new EventoBotonLineasPulsado());
+		lineas.addActionListener(eventoBotonLineasPulsado);
 		GridLayout gl1 = new GridLayout(2,0);
 		gl1.setVgap(5);
 		GridLayout glb = new GridLayout(2,2);
@@ -61,8 +70,8 @@ public class ScreensManager {
 		JLabel texto = new JLabel("<html><div style='text-align: center;'> Gestión de "
 				+"Líneas</div></html>", SwingConstants.CENTER);
 		texto.setFont(fuente);
-		ver.addActionListener(new EventoVerLineas());
-		agregar.addActionListener(new EventoNuevaLinea());
+		ver.addActionListener(eventoVerLineas);
+		agregar.addActionListener(eventoNuevaLinea);
 		GridLayout gl = new GridLayout(2,0);
 		gl.setVgap(5);
 		GridLayout glb = new GridLayout(0,2);
@@ -83,7 +92,6 @@ public class ScreensManager {
 	
 	public static void nuevaLinea(int tipo) {
 		int tamText = 15;
-		float izquierda = Component.LEFT_ALIGNMENT;
 		
 		JFrame ventana = new JFrame("Nueva Línea");
 		JLabel texto1 = new JLabel("N° de Línea:");
@@ -101,6 +109,12 @@ public class ScreensManager {
 		JRadioButton aire = new JRadioButton("Aire Acond.");
 		JButton cancelar = new JButton("Cancelar");
 		JButton guardar = new JButton("Guardar");
+		
+		eventoCancelar.configurar(ventana);
+		cancelar.addActionListener(eventoCancelar);
+		eventoGuardarLinea.configurar(num, nombre, color, sentados, parados, wifi, aire,
+				tipo, ventana);
+		guardar.addActionListener(eventoGuardarLinea);
 		
 		JPanel botonera = new JPanel();
 		botonera.setLayout(new GridBagLayout());
@@ -153,10 +167,10 @@ public class ScreensManager {
 		lugar.gridy = 2;
 		ventana.getContentPane().add(color, lugar);
 		lugar.gridy = 3;
-		ventana.getContentPane().add(parados, lugar);
+		ventana.getContentPane().add(sentados, lugar);
 		lugar.gridy = 4;
 		if(tipo == 1) {
-			ventana.getContentPane().add(sentados, lugar);
+			ventana.getContentPane().add(parados, lugar);
 		}
 		lugar.gridx = 0;
 		lugar.gridy = 5;
