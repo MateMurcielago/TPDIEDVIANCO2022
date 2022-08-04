@@ -5,13 +5,14 @@ import java.awt.event.ActionListener;
 
 import tp.app.App;
 
-public class EventoBotonPulsado implements ActionListener {
-	public EventoBotonPulsado() {
+public class EventoVerLineas implements ActionListener {
+	public EventoVerLineas() {
 		super();
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		App.a();
+		if(!App.hayLineas()) {
+			ScreensManager.sinElementos();
+		}
 	}
-
 }
