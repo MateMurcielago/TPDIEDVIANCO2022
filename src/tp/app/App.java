@@ -30,4 +30,29 @@ public class App {
 			return true;
 		}
 	}
+	
+	public static void addLinea(String nombre, String color, int sentados, 
+			int parados, boolean wifi, boolean aire, int tipo) {
+		if(tipo == 1) {
+			addEconomica(nombre, color, sentados, parados);
+		} else {
+			addSuperior(nombre, color, sentados, wifi, aire);
+		}
+	}
+	
+	private static void addEconomica(String nombre, String color, int sentados,
+			int parados) {
+		int id = 0;
+		if(parados == -1) {
+			lineas.add(new Economica(id + 1, nombre, color, sentados));
+		} else {
+			lineas.add(new Economica(id, nombre, color, sentados, parados));
+		}
+	}
+	
+	private static void addSuperior(String nombre, String color, int sentados,
+			boolean wifi, boolean aire) {
+		int id = 0;
+		lineas.add(new Superior(id + 1, nombre, color, sentados, wifi, aire));
+	}
 }

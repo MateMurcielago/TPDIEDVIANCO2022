@@ -8,7 +8,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 public class EventoGuardarLinea implements ActionListener {
-	private JTextField num;
 	private JTextField nombre;
 	private JTextField color;
 	private JTextField sentados;
@@ -18,11 +17,10 @@ public class EventoGuardarLinea implements ActionListener {
 	private int tipo;
 	private JFrame ventana;
 	
-	public EventoGuardarLinea(JTextField num, JTextField nombre, JTextField color, 
+	public EventoGuardarLinea(JTextField nombre, JTextField color, 
 			JTextField sentados, JTextField parados, JRadioButton wifi, JRadioButton aire, 
 			int tipo, JFrame ventana) {
 		super();
-		this.num = num;
 		this.nombre = nombre;
 		this.color = color;
 		this.sentados = sentados;
@@ -46,10 +44,9 @@ public class EventoGuardarLinea implements ActionListener {
 		}
 	}
 	
-	public void configurar(JTextField num, JTextField nombre, JTextField color, 
+	public void configurar(JTextField nombre, JTextField color, 
 			JTextField sentados, JTextField parados, JRadioButton wifi, JRadioButton aire, 
 			int tipo, JFrame ventana) {
-		this.num = num;
 		this.nombre = nombre;
 		this.color = color;
 		this.sentados = sentados;

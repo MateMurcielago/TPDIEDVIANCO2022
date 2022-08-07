@@ -11,8 +11,10 @@ public class EventoVerLineas implements ActionListener {
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if(!App.hayLineas()) {
+		/*if(!App.hayLineas()) {
 			ScreensManager.sinElementos();
-		}
+		}*/
+		
+		ScreensManager.verLineas();
 	}
 }

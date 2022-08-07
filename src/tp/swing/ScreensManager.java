@@ -1,8 +1,10 @@
 package tp.swing;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -15,9 +17,13 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 
 public class ScreensManager {
 	//Fuente de menú
@@ -29,6 +35,7 @@ public class ScreensManager {
 	private static EventoCancelar eventoCancelar = new EventoCancelar();
 	private static EventoGuardarLinea eventoGuardarLinea = new EventoGuardarLinea();
 	private static EventoNuevaLinea eventoNuevaLinea = new EventoNuevaLinea();
+	private static EventoParadasLinea eventoParadasLinea = new EventoParadasLinea();
 	private static EventoVerLineas eventoVerLineas = new EventoVerLineas();
 	
 	public static void PantallaPrincipal() {
@@ -94,9 +101,9 @@ public class ScreensManager {
 		int tamText = 15;
 		
 		JFrame ventana = new JFrame("Nueva Línea");
-		JLabel texto1 = new JLabel("N° de Línea:");
-		texto1.setHorizontalAlignment(SwingConstants.RIGHT);
-		JTextField num = new JTextField(tamText);
+		//JLabel texto1 = new JLabel("N° de Línea:");
+		//texto1.setHorizontalAlignment(SwingConstants.RIGHT);
+		//JTextField num = new JTextField(tamText);
 		JLabel texto2 = new JLabel("Nombre:");
 		JTextField nombre = new JTextField(tamText);
 		JLabel texto3 = new JLabel("Color:");
@@ -112,7 +119,7 @@ public class ScreensManager {
 		
 		eventoCancelar.configurar(ventana);
 		cancelar.addActionListener(eventoCancelar);
-		eventoGuardarLinea.configurar(num, nombre, color, sentados, parados, wifi, aire,
+		eventoGuardarLinea.configurar(nombre, color, sentados, parados, wifi, aire,
 				tipo, ventana);
 		guardar.addActionListener(eventoGuardarLinea);
 		
@@ -145,7 +152,7 @@ public class ScreensManager {
 		lugar.gridheight = 1;
 		lugar.weighty = 1.0;
 		lugar.weightx = 1.0;
-		ventana.getContentPane().add(texto1, lugar);
+		//ventana.getContentPane().add(texto1, lugar);
 		lugar.gridy = 1;
 		ventana.getContentPane().add(texto2, lugar);
 		lugar.gridy = 2;
@@ -160,7 +167,7 @@ public class ScreensManager {
 		lugar.gridy = 0;
 		lugar.gridwidth = 4;
 		lugar.anchor = lugar.CENTER;
-		ventana.getContentPane().add(num, lugar);
+		//ventana.getContentPane().add(num, lugar);
 		lugar.gridy = 1;
 		lugar.weighty = 0.0;
 		ventana.getContentPane().add(nombre, lugar);
@@ -190,6 +197,67 @@ public class ScreensManager {
 			lugar.gridwidth = 5;
 			ventana.getContentPane().add(servicios, lugar);
 		}
+		ventana.setVisible(true);
+	}
+	
+	public static void verLineas() {
+		JFrame ventana = new JFrame("Ver Líneas");
+		JLabel texto = new JLabel ("Hola");
+		JPanel botonera = new JPanel();
+		JScrollPane panelDeslizable = new JScrollPane();
+		panelDeslizable.setBounds(800, 280, 366, 181);
+		String[] columnas = {"ID", "Tipo", "Nombre", "Color", "Pasaj. Sentados",
+				"Pasaj. Parados", "WiFi", "Aire Acond." };
+		DefaultTableModel modelo = new DefaultTableModel(null, columnas);
+		JButton paradas = new JButton("Paradas");
+		
+		ventana.setLayout(new GridBagLayout());
+		botonera.setLayout(new GridBagLayout());
+		GridBagConstraints lugar = new GridBagConstraints();
+
+		JTable tabla = new JTable(modelo);
+		tabla.setPreferredScrollableViewportSize(new Dimension(800, 280));
+		panelDeslizable.setViewportView(tabla);
+		
+		eventoParadasLinea.configurar(tabla);
+		paradas.addActionListener(eventoParadasLinea);
+		
+		ventana.setSize(900, 400);
+		ventana.setLocationRelativeTo(null);
+		
+		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+		centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+		
+		String[] aux = {"1", "S", "Tu Mamá", "Amarillo", "100", "0", "SÍ", "NO"};
+		modelo.addRow(aux);
+		for(int i = 0; i < 8; i++) {
+			tabla.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+		}
+		
+		panelDeslizable.setViewportView(tabla);
+		panelDeslizable.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		panelDeslizable.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		botonera.add(paradas, lugar);
+		
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		ventana.getContentPane().add(texto, lugar);
+		lugar.gridy = 1;
+		lugar.weighty = 0.0;
+		lugar.weightx = 0.0;
+		ventana.getContentPane().add(panelDeslizable, lugar);
+		lugar.gridy = 2;
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		ventana.getContentPane().add(botonera, lugar);
+		//ventana.pack();
 		ventana.setVisible(true);
 	}
 	
