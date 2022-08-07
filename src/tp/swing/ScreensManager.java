@@ -25,18 +25,28 @@ import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
+import tp.app.App;
+
 public class ScreensManager {
 	//Fuente de menú
 	private static Font fuente = new Font("Audiowide", Font.PLAIN, 18);
 	
 	//Eventos
+	private static EventoBotonCaminosPulsado eventoBotonCaminosPulsado =
+			new EventoBotonCaminosPulsado();
 	private static EventoBotonLineasPulsado eventoBotonLineasPulsado = 
 			new EventoBotonLineasPulsado();
+	private static EventoBotonParadasPulsado eventoBotonParadasPulsado =
+			new EventoBotonParadasPulsado();
 	private static EventoCancelar eventoCancelar = new EventoCancelar();
 	private static EventoGuardarLinea eventoGuardarLinea = new EventoGuardarLinea();
+	private static EventoGuardarParada eventoGuardarParada = new EventoGuardarParada();
+	private static EventoNuevoCamino eventoNuevoCamino = new EventoNuevoCamino();
 	private static EventoNuevaLinea eventoNuevaLinea = new EventoNuevaLinea();
+	private static EventoNuevaParada eventoNuevaParada = new EventoNuevaParada();
 	private static EventoParadasLinea eventoParadasLinea = new EventoParadasLinea();
 	private static EventoVerLineas eventoVerLineas = new EventoVerLineas();
+	private static EventoVerParadas eventoVerParadas = new EventoVerParadas();
 	
 	public static void PantallaPrincipal() {
 		JFrame ventana = new JFrame("Gestión de Transporte");
@@ -50,6 +60,8 @@ public class ScreensManager {
 				, SwingConstants.CENTER);
 		texto.setFont(fuente);
 		lineas.addActionListener(eventoBotonLineasPulsado);
+		paradas.addActionListener(eventoBotonParadasPulsado);
+		caminos.addActionListener(eventoBotonCaminosPulsado);
 		GridLayout gl1 = new GridLayout(2,0);
 		gl1.setVgap(5);
 		GridLayout glb = new GridLayout(2,2);
@@ -202,7 +214,7 @@ public class ScreensManager {
 	
 	public static void verLineas() {
 		JFrame ventana = new JFrame("Ver Líneas");
-		JLabel texto = new JLabel ("Hola");
+		JLabel texto = new JLabel ("Elija una línea para ver más detalles");
 		JPanel botonera = new JPanel();
 		JScrollPane panelDeslizable = new JScrollPane();
 		panelDeslizable.setBounds(800, 280, 366, 181);
@@ -228,8 +240,9 @@ public class ScreensManager {
 		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
 		centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
 		
-		String[] aux = {"1", "S", "Tu Mamá", "Amarillo", "100", "0", "SÍ", "NO"};
-		modelo.addRow(aux);
+		for(int i = 0; i < App.getCantLineas(); i++) {
+			modelo.addRow(App.getFilaLineas(i));
+		}
 		for(int i = 0; i < 8; i++) {
 			tabla.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
 		}
@@ -259,6 +272,258 @@ public class ScreensManager {
 		ventana.getContentPane().add(botonera, lugar);
 		//ventana.pack();
 		ventana.setVisible(true);
+	}
+	
+	public static void paradas() {
+		JFrame ventana = new JFrame("Paradas");
+		JPanel botonera = new JPanel();
+		JButton ver = new JButton("Ver Paradas");
+		JButton agregar = new JButton("Nueva Parada");
+		JLabel texto = new JLabel("<html><div style='text-align: center;'> Gestión de "
+				+"Paradas</div></html>", SwingConstants.CENTER);
+		texto.setFont(fuente);
+		ver.addActionListener(eventoVerParadas);
+		agregar.addActionListener(eventoNuevaParada);
+		GridLayout gl = new GridLayout(2,0);
+		gl.setVgap(5);
+		GridLayout glb = new GridLayout(0,2);
+		glb.setHgap(10);
+		glb.setVgap(15);
+		botonera.setLayout(glb);
+		Container c = ventana.getContentPane();
+		c.setLayout(gl);
+		botonera.setLayout(glb);
+		botonera.add(ver);
+		botonera.add(agregar);
+		c.add(texto);
+		c.add(botonera);		
+		ventana.setSize(270, 100);
+		ventana.setLocationRelativeTo(null);
+		ventana.setVisible(true);
+	}
+	
+	public static void nuevaParada() {
+		int tamText = 15;
+		
+		JFrame ventana = new JFrame("Nueva Parada");
+		JLabel texto1 = new JLabel("N° Parada:");
+		JTextField num = new JTextField(20);
+		JLabel texto2 = new JLabel("Calle y N°:");
+		JTextField calle = new JTextField(tamText);
+		JTextField num_dir = new JTextField(4);
+		JButton cancelar = new JButton("Cancelar");
+		JButton guardar = new JButton("Guardar");
+		
+		eventoGuardarParada.configurar(num, calle, num_dir, ventana);
+		guardar.addActionListener(eventoGuardarParada);
+		eventoCancelar.configurar(ventana);
+		cancelar.addActionListener(eventoCancelar);
+		
+		JPanel botonera = new JPanel();
+		botonera.setLayout(new GridBagLayout());
+		GridBagConstraints lugar = new GridBagConstraints();
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.gridwidth = 1;
+		lugar.gridheight = 1;
+		botonera.add(guardar, lugar);
+		lugar.gridx = 1;
+		lugar.gridx = 2;
+		botonera.add(new JPanel(), lugar);
+		lugar.gridx = 3;
+		botonera.add(cancelar, lugar);
+		
+		JPanel calle_y_num = new JPanel();
+		calle_y_num.setLayout(new GridBagLayout());
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		calle_y_num.add(calle, lugar);
+		lugar.gridx = 1;
+		calle_y_num.add(new JPanel(), lugar);
+		lugar.gridx = 2;
+		calle_y_num.add(num_dir, lugar);
+		
+		ventana.setSize(320, 120);
+		ventana.setLocationRelativeTo(null);
+		ventana.getContentPane().setLayout(new GridBagLayout());
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.anchor = lugar.EAST;
+		lugar.gridwidth = 1;
+		lugar.gridheight = 1;
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		ventana.getContentPane().add(texto1, lugar);
+		lugar.gridy = 1;
+		ventana.getContentPane().add(texto2, lugar);
+		lugar.gridx = 1;
+		lugar.gridy = 0;
+		lugar.gridwidth = 4;
+		lugar.anchor = lugar.CENTER;
+		ventana.getContentPane().add(num, lugar);
+		lugar.gridy = 1;
+		lugar.weighty = 0.0;
+		ventana.getContentPane().add(calle_y_num, lugar);
+		lugar.gridx = 0;
+		lugar.gridy = 2;
+		lugar.gridwidth = 5;
+		ventana.getContentPane().add(botonera, lugar);
+		ventana.setVisible(true);
+	}
+	
+	public static void verParadas() {
+		JFrame ventana = new JFrame("Ver Paradas");
+		JLabel texto = new JLabel ("Elija una parada para ver más detalles");
+		JPanel botonera = new JPanel();
+		JScrollPane panelDeslizable = new JScrollPane();
+		panelDeslizable.setBounds(600, 280, 366, 181);
+		String[] columnas = {"ID", "N° Parada", "Calle", "N° Calle" };
+		DefaultTableModel modelo = new DefaultTableModel(null, columnas);
+		JButton paradas = new JButton("Paradas");
+
+		ventana.setLayout(new GridBagLayout());
+		botonera.setLayout(new GridBagLayout());
+		GridBagConstraints lugar = new GridBagConstraints();
+
+		JTable tabla = new JTable(modelo);
+		tabla.setPreferredScrollableViewportSize(new Dimension(600, 280));
+		panelDeslizable.setViewportView(tabla);
+
+		ventana.setSize(700, 400);
+		ventana.setLocationRelativeTo(null);
+
+		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+		centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+
+		for(int i = 0; i < App.getCantParadas(); i++) {
+			modelo.addRow(App.getFilaParadas(i));
+		}
+		for(int i = 0; i < 4; i++) {
+			tabla.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+		}
+
+		panelDeslizable.setViewportView(tabla);
+		panelDeslizable.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		panelDeslizable.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		botonera.add(paradas, lugar);
+		
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		ventana.getContentPane().add(texto, lugar);
+		lugar.gridy = 1;
+		lugar.weighty = 0.0;
+		lugar.weightx = 0.0;
+		ventana.getContentPane().add(panelDeslizable, lugar);
+		lugar.gridy = 2;
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		ventana.getContentPane().add(botonera, lugar);
+		//ventana.pack();
+		ventana.setVisible(true);
+	}
+	
+	public static void caminos() {
+		JFrame ventana = new JFrame("Caminos");
+		JPanel botonera = new JPanel();
+		JButton ver = new JButton("Ver Caminos");
+		JButton agregar = new JButton("Nuevo Camino");
+		JLabel texto = new JLabel("<html><div style='text-align: center;'> Gestión de "
+				+"Caminos</div></html>", SwingConstants.CENTER);
+		texto.setFont(fuente);
+		agregar.addActionListener(eventoNuevoCamino);
+		GridLayout gl = new GridLayout(2,0);
+		gl.setVgap(5);
+		GridLayout glb = new GridLayout(0,2);
+		glb.setHgap(10);
+		glb.setVgap(15);
+		botonera.setLayout(glb);
+		Container c = ventana.getContentPane();
+		c.setLayout(gl);
+		botonera.setLayout(glb);
+		botonera.add(ver);
+		botonera.add(agregar);
+		c.add(texto);
+		c.add(botonera);		
+		ventana.setSize(270, 100);
+		ventana.setLocationRelativeTo(null);
+		ventana.setVisible(true);
+	}
+	
+	public static void nuevoCamino() {
+		int tamText = 15;
+		
+		JFrame ventana = new JFrame("Nuevo Camino");
+		JLabel origen = new JLabel("Origen: -");
+		JLabel destino = new JLabel("Destino: -");
+		JLabel texto = new JLabel("Distancia:");
+		JTextField distancia = new JTextField(tamText);
+		JButton addOrigen = new JButton("Origen");
+		JButton addDestino = new JButton("Destino");
+		JButton guardar = new JButton("Guardar");
+		JButton cancelar = new JButton("Cancelar");
+		
+		JPanel botonera1 = new JPanel();
+		botonera1.setLayout(new GridBagLayout());
+		GridBagConstraints lugar = new GridBagConstraints();
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.gridwidth = 1;
+		lugar.gridheight = 1;
+		botonera1.add(addOrigen, lugar);
+		lugar.gridx = 1;
+		lugar.gridx = 2;
+		botonera1.add(new JPanel(), lugar);
+		lugar.gridx = 3;
+		botonera1.add(addDestino, lugar);
+		
+		JPanel botonera2 = new JPanel();
+		botonera2.setLayout(new GridBagLayout());
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.gridwidth = 1;
+		lugar.gridheight = 1;
+		botonera2.add(guardar, lugar);
+		lugar.gridx = 1;
+		lugar.gridx = 2;
+		botonera2.add(new JPanel(), lugar);
+		lugar.gridx = 3;
+		botonera2.add(cancelar, lugar);
+		
+		ventana.setSize(280, 180);
+		ventana.setLocationRelativeTo(null);
+		ventana.getContentPane().setLayout(new GridBagLayout());
+		lugar.gridx = 0;
+		lugar.gridy = 2;
+		lugar.anchor = lugar.EAST;
+		lugar.gridwidth = 1;
+		lugar.gridheight = 1;
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		ventana.getContentPane().add(texto, lugar);
+		lugar.gridx = 1;
+		lugar.gridy = 2;
+		lugar.gridwidth = 4;
+		lugar.anchor = lugar.CENTER;
+		ventana.getContentPane().add(distancia, lugar);
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.gridwidth = 5;
+		ventana.getContentPane().add(origen, lugar);
+		lugar.gridy = 1;
+		ventana.getContentPane().add(destino, lugar);
+		lugar.gridy = 3;
+		ventana.getContentPane().add(botonera1, lugar);
+		lugar.gridy = 4;
+		ventana.getContentPane().add(botonera2, lugar);
+		ventana.setVisible(true);
+		
 	}
 	
 	public static void sinElementos() {

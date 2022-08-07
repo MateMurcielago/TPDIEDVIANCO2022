@@ -5,16 +5,17 @@ import java.awt.event.ActionListener;
 
 import tp.app.App;
 
-public class EventoVerLineas implements ActionListener {
-	public EventoVerLineas() {
+public class EventoVerParadas implements ActionListener {
+	public EventoVerParadas() {
 		super();
 	}
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if(!App.hayLineas()) {
+		if(!App.hayParadas()) {
 			ScreensManager.sinElementos();
 		} else {
-			ScreensManager.verLineas();
+			ScreensManager.verParadas();
 		}
 	}
 }

@@ -11,7 +11,7 @@ public class Economica extends Linea {
 	public Economica(int id, String nombre, String color, int maxPasajerosSentados, 
 			int maxPasajerosParados) {
 		super(id, nombre, color, maxPasajerosSentados);
-		this.setMaxPasajerosSentados(maxPasajerosSentados);
+		this.setMaxPasajerosParados(maxPasajerosParados);
 	}
 
 	public int getMaxPasajerosParados() {

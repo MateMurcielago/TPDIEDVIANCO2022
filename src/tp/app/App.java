@@ -10,7 +10,9 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableModel;
 
 import tp.clases.*;
 import tp.db.*;
@@ -18,6 +20,7 @@ import tp.swing.ScreensManager;
 
 public class App {
 	private static ArrayList<Linea> lineas = new ArrayList<Linea>();
+	private static ArrayList<Parada> paradas = new ArrayList<Parada>();
 	
 	public static void main(String[] args) {
 		ScreensManager.PantallaPrincipal();
@@ -25,6 +28,14 @@ public class App {
 	
 	public static boolean hayLineas() {
 		if(lineas.isEmpty()) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	public static boolean hayParadas() {
+		if(paradas.isEmpty()) {
 			return false;
 		} else {
 			return true;
@@ -46,7 +57,7 @@ public class App {
 		if(parados == -1) {
 			lineas.add(new Economica(id + 1, nombre, color, sentados));
 		} else {
-			lineas.add(new Economica(id, nombre, color, sentados, parados));
+			lineas.add(new Economica(id + 1, nombre, color, sentados, parados));
 		}
 	}
 	
@@ -54,5 +65,55 @@ public class App {
 			boolean wifi, boolean aire) {
 		int id = 0;
 		lineas.add(new Superior(id + 1, nombre, color, sentados, wifi, aire));
+	}
+	
+	public static void addParada(int nroParada, String calle, int nroCalle) {
+		int id = 0;
+		paradas.add(new Parada(id + 1, nroParada, calle, nroCalle));
+	}
+	
+	public static int getCantLineas() {
+		return lineas.size();
+	}
+	
+	public static String[] getFilaLineas(int i) {
+		String[] fila = {"", "", "", "", "", "", "", ""};
+		fila[0] = Integer.toString(lineas.get(i).getId());
+		fila[2] = lineas.get(i).getNombre();
+		fila[3] = lineas.get(i).getColor();
+		fila[4] = Integer.toString(lineas.get(i).getMaxPasajerosSentados());
+		if(lineas.get(i) instanceof Economica) {
+			fila[1] = "Económica";
+			fila[5] = Integer.toString(((Economica) lineas.get(i)).getMaxPasajerosParados());
+			fila[6] = "-";
+			fila[7] = "-";
+		} else {
+			fila[1] = "Superior";
+			fila[5] = "0";
+			if(((Superior) lineas.get(i)).isWifi()) {
+				fila[6] = "SÍ";
+			} else {
+				fila[6] = "NO";
+			}
+			if(((Superior) lineas.get(i)).isAireAcondicionado()) {
+				fila[7] = "SÍ";
+			} else {
+				fila[7] = "NO";
+			}
+		}
+		return fila;
+	}
+	
+	public static int getCantParadas() {
+		return paradas.size();
+	}
+	
+	public static String[] getFilaParadas(int i) {
+		String[] fila = {"", "", "", ""};
+		fila[0] = Integer.toString(paradas.get(i).getId());
+		fila[1] = Integer.toString(paradas.get(i).getNroParada());
+		fila[2] = paradas.get(i).getCalle();
+		fila[3] = Integer.toString(paradas.get(i).getNroCalle());
+		return fila;
 	}
 }
