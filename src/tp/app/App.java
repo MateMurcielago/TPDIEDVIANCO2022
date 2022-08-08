@@ -21,7 +21,7 @@ import tp.swing.ScreensManager;
 public class App {
 	private static ArrayList<Linea> lineas = new ArrayList<Linea>();
 	private static ArrayList<Parada> paradas = new ArrayList<Parada>();
-	
+	private static ArrayList<Camino> caminos = new ArrayList<Camino>();
 	public static void main(String[] args) {
 		ScreensManager.PantallaPrincipal();
 	}
@@ -36,6 +36,14 @@ public class App {
 	
 	public static boolean hayParadas() {
 		if(paradas.isEmpty()) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	public static boolean hayCaminos() {
+		if(caminos.isEmpty()) {
 			return false;
 		} else {
 			return true;
@@ -69,7 +77,19 @@ public class App {
 	
 	public static void addParada(int nroParada, String calle, int nroCalle) {
 		int id = 0;
+		if(!paradas.isEmpty()) {
+			for(int i = 0; i < paradas.size(); i++) {
+				if(paradas.get(i).getId() > id) id = paradas.get(i).getId();
+			}
+		}
 		paradas.add(new Parada(id + 1, nroParada, calle, nroCalle));
+	}
+	
+	public static void addCamino(int id_origen, int id_destino, float distancia) {
+		int id = 0;
+		caminos.add(new Camino(id + 1, 
+				paradas.stream().filter(p -> p.getId() == id_origen).findFirst().get(),
+				paradas.stream().filter(p -> p.getId() == id_destino).findFirst().get(), distancia));
 	}
 	
 	public static int getCantLineas() {
@@ -115,5 +135,34 @@ public class App {
 		fila[2] = paradas.get(i).getCalle();
 		fila[3] = Integer.toString(paradas.get(i).getNroCalle());
 		return fila;
+	}
+	
+	public static int getCantCaminos() {
+		return caminos.size();
+	}
+	
+	public static String[] getFilaCaminos(int i) {
+		String[] fila = {"", "", "", ""};
+		fila[0] = Integer.toString(caminos.get(i).getId());
+		fila[1] = caminos.get(i).getOrigen().getCalle()+" "+caminos.get(i).getOrigen().getNroCalle();
+		fila[2] = caminos.get(i).getDestino().getCalle()+" "+caminos.get(i).getDestino().getNroCalle();
+		fila[3] = Float.toString(caminos.get(i).getDistancia());
+		return fila;
+	}
+	
+	public static String direccionDe(int id) {
+		String dir = paradas.stream().filter(p -> p.getId() == id).findFirst().get().getCalle();
+		int num = paradas.stream().filter(p -> p.getId() == id).findFirst().get().getNroCalle();
+		return dir+" "+num;
+	}
+	
+	public static boolean isParada(int id) {
+		if(paradas.isEmpty()) {
+			return false;
+		} else if(paradas.stream().filter(p -> p.getId() == id).findFirst().isEmpty()) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 }

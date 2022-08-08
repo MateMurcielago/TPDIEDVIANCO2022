@@ -39,12 +39,16 @@ public class ScreensManager {
 	private static EventoBotonParadasPulsado eventoBotonParadasPulsado =
 			new EventoBotonParadasPulsado();
 	private static EventoCancelar eventoCancelar = new EventoCancelar();
+	private static EventoGuardarCamino eventoGuardarCamino = new EventoGuardarCamino();
 	private static EventoGuardarLinea eventoGuardarLinea = new EventoGuardarLinea();
 	private static EventoGuardarParada eventoGuardarParada = new EventoGuardarParada();
 	private static EventoNuevoCamino eventoNuevoCamino = new EventoNuevoCamino();
 	private static EventoNuevaLinea eventoNuevaLinea = new EventoNuevaLinea();
 	private static EventoNuevaParada eventoNuevaParada = new EventoNuevaParada();
+	private static EventoOrigenDestino eventoOrigen = new EventoOrigenDestino(1);
+	private static EventoOrigenDestino eventoDestino = new EventoOrigenDestino(2);
 	private static EventoParadasLinea eventoParadasLinea = new EventoParadasLinea();
+	private static EventoVerCaminos eventoVerCaminos = new EventoVerCaminos();
 	private static EventoVerLineas eventoVerLineas = new EventoVerLineas();
 	private static EventoVerParadas eventoVerParadas = new EventoVerParadas();
 	
@@ -438,6 +442,7 @@ public class ScreensManager {
 				+"Caminos</div></html>", SwingConstants.CENTER);
 		texto.setFont(fuente);
 		agregar.addActionListener(eventoNuevoCamino);
+		ver.addActionListener(eventoVerCaminos);
 		GridLayout gl = new GridLayout(2,0);
 		gl.setVgap(5);
 		GridLayout glb = new GridLayout(0,2);
@@ -458,6 +463,8 @@ public class ScreensManager {
 	
 	public static void nuevoCamino() {
 		int tamText = 15;
+		int id_origen = 0;
+		int id_destino = 0;
 		
 		JFrame ventana = new JFrame("Nuevo Camino");
 		JLabel origen = new JLabel("Origen: -");
@@ -468,6 +475,15 @@ public class ScreensManager {
 		JButton addDestino = new JButton("Destino");
 		JButton guardar = new JButton("Guardar");
 		JButton cancelar = new JButton("Cancelar");
+		
+		eventoOrigen.configurar(ventana, id_origen, id_destino, origen, destino);
+		addOrigen.addActionListener(eventoOrigen);
+		eventoDestino.configurar(ventana, id_origen, id_destino, origen, destino);
+		addDestino.addActionListener(eventoDestino);
+		eventoCancelar.configurar(ventana);
+		cancelar.addActionListener(eventoCancelar);
+		eventoGuardarCamino.configurar(ventana, id_origen, id_destino, distancia);
+		guardar.addActionListener(eventoGuardarCamino);
 		
 		JPanel botonera1 = new JPanel();
 		botonera1.setLayout(new GridBagLayout());
@@ -524,6 +540,141 @@ public class ScreensManager {
 		ventana.getContentPane().add(botonera2, lugar);
 		ventana.setVisible(true);
 		
+	}
+	
+	public static void nuevoCamino(JLabel origen, JLabel destino, int id_origen, int id_destino) {
+		int tamText = 15;
+		
+		JFrame ventana = new JFrame("Nuevo Camino");
+		JLabel texto = new JLabel("Distancia:");
+		JTextField distancia = new JTextField(tamText);
+		JButton addOrigen = new JButton("Origen");
+		JButton addDestino = new JButton("Destino");
+		JButton guardar = new JButton("Guardar");
+		JButton cancelar = new JButton("Cancelar");
+		
+		eventoOrigen.configurar(ventana, id_origen, id_destino, origen, destino);
+		addOrigen.addActionListener(eventoOrigen);
+		eventoDestino.configurar(ventana, id_origen, id_destino, origen, destino);
+		addDestino.addActionListener(eventoDestino);
+		eventoCancelar.configurar(ventana);
+		cancelar.addActionListener(eventoCancelar);
+		eventoGuardarCamino.configurar(ventana, id_origen, id_destino, distancia);
+		guardar.addActionListener(eventoGuardarCamino);
+		
+		JPanel botonera1 = new JPanel();
+		botonera1.setLayout(new GridBagLayout());
+		GridBagConstraints lugar = new GridBagConstraints();
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.gridwidth = 1;
+		lugar.gridheight = 1;
+		botonera1.add(addOrigen, lugar);
+		lugar.gridx = 1;
+		lugar.gridx = 2;
+		botonera1.add(new JPanel(), lugar);
+		lugar.gridx = 3;
+		botonera1.add(addDestino, lugar);
+		
+		JPanel botonera2 = new JPanel();
+		botonera2.setLayout(new GridBagLayout());
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.gridwidth = 1;
+		lugar.gridheight = 1;
+		botonera2.add(guardar, lugar);
+		lugar.gridx = 1;
+		lugar.gridx = 2;
+		botonera2.add(new JPanel(), lugar);
+		lugar.gridx = 3;
+		botonera2.add(cancelar, lugar);
+		
+		ventana.setSize(280, 180);
+		ventana.setLocationRelativeTo(null);
+		ventana.getContentPane().setLayout(new GridBagLayout());
+		lugar.gridx = 0;
+		lugar.gridy = 2;
+		lugar.anchor = lugar.EAST;
+		lugar.gridwidth = 1;
+		lugar.gridheight = 1;
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		ventana.getContentPane().add(texto, lugar);
+		lugar.gridx = 1;
+		lugar.gridy = 2;
+		lugar.gridwidth = 4;
+		lugar.anchor = lugar.CENTER;
+		ventana.getContentPane().add(distancia, lugar);
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.gridwidth = 5;
+		ventana.getContentPane().add(origen, lugar);
+		lugar.gridy = 1;
+		ventana.getContentPane().add(destino, lugar);
+		lugar.gridy = 3;
+		ventana.getContentPane().add(botonera1, lugar);
+		lugar.gridy = 4;
+		ventana.getContentPane().add(botonera2, lugar);
+		ventana.setVisible(true);
+		
+	}
+	
+	public static void verCaminos() {
+		JFrame ventana = new JFrame("Ver Caminos");
+		JLabel texto = new JLabel ("Elija un camino para ver más detalles");
+		JPanel botonera = new JPanel();
+		JScrollPane panelDeslizable = new JScrollPane();
+		panelDeslizable.setBounds(600, 280, 366, 181);
+		String[] columnas = {"ID", "Origen", "Destino", "Distancia"};
+		DefaultTableModel modelo = new DefaultTableModel(null, columnas);
+		JButton ok = new JButton("Ok");
+
+		ventana.setLayout(new GridBagLayout());
+		botonera.setLayout(new GridBagLayout());
+		GridBagConstraints lugar = new GridBagConstraints();
+
+		JTable tabla = new JTable(modelo);
+		tabla.setPreferredScrollableViewportSize(new Dimension(600, 280));
+		panelDeslizable.setViewportView(tabla);
+
+		ventana.setSize(700, 400);
+		ventana.setLocationRelativeTo(null);
+
+		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+		centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+
+		for(int i = 0; i < App.getCantCaminos(); i++) {
+			modelo.addRow(App.getFilaCaminos(i));
+		}
+		for(int i = 0; i < 4; i++) {
+			tabla.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+		}
+
+		panelDeslizable.setViewportView(tabla);
+		panelDeslizable.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		panelDeslizable.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		botonera.add(ok, lugar);
+		
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		ventana.getContentPane().add(texto, lugar);
+		lugar.gridy = 1;
+		lugar.weighty = 0.0;
+		lugar.weightx = 0.0;
+		ventana.getContentPane().add(panelDeslizable, lugar);
+		lugar.gridy = 2;
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		ventana.getContentPane().add(botonera, lugar);
+		//ventana.pack();
+		ventana.setVisible(true);
 	}
 	
 	public static void sinElementos() {
