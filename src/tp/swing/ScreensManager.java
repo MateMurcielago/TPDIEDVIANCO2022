@@ -39,16 +39,21 @@ public class ScreensManager {
 	private static EventoBotonParadasPulsado eventoBotonParadasPulsado =
 			new EventoBotonParadasPulsado();
 	private static EventoCancelar eventoCancelar = new EventoCancelar();
+	private static EventoDetallesCamino eventoDetallesCamino = new EventoDetallesCamino();
 	private static EventoGuardarCamino eventoGuardarCamino = new EventoGuardarCamino();
+	private static EventoGuardarIncidencia eventoGuardarIncidencia = new EventoGuardarIncidencia();
 	private static EventoGuardarLinea eventoGuardarLinea = new EventoGuardarLinea();
 	private static EventoGuardarParada eventoGuardarParada = new EventoGuardarParada();
 	private static EventoNuevoCamino eventoNuevoCamino = new EventoNuevoCamino();
+	private static EventoNuevaIncidencia eventoNuevaIncidencia = new EventoNuevaIncidencia();
 	private static EventoNuevaLinea eventoNuevaLinea = new EventoNuevaLinea();
 	private static EventoNuevaParada eventoNuevaParada = new EventoNuevaParada();
 	private static EventoOrigenDestino eventoOrigen = new EventoOrigenDestino(1);
 	private static EventoOrigenDestino eventoDestino = new EventoOrigenDestino(2);
 	private static EventoParadasLinea eventoParadasLinea = new EventoParadasLinea();
 	private static EventoVerCaminos eventoVerCaminos = new EventoVerCaminos();
+	private static EventoVerIncidenciasCamino eventoVerIncidenciasCamino =
+			new EventoVerIncidenciasCamino();
 	private static EventoVerLineas eventoVerLineas = new EventoVerLineas();
 	private static EventoVerParadas eventoVerParadas = new EventoVerParadas();
 	
@@ -636,6 +641,10 @@ public class ScreensManager {
 		JTable tabla = new JTable(modelo);
 		tabla.setPreferredScrollableViewportSize(new Dimension(600, 280));
 		panelDeslizable.setViewportView(tabla);
+		
+
+		eventoDetallesCamino.configurar(tabla);
+		ok.addActionListener(eventoDetallesCamino);
 
 		ventana.setSize(700, 400);
 		ventana.setLocationRelativeTo(null);
@@ -675,6 +684,242 @@ public class ScreensManager {
 		ventana.getContentPane().add(botonera, lugar);
 		//ventana.pack();
 		ventana.setVisible(true);
+	}
+	
+	public static void detallesCamino(int id) {
+		JFrame ventana = new JFrame("Más detalles");
+		JLabel texto = new JLabel("<html><div style='text-align: center;'>Camino desde "
+				+App.getOrigenDe(id)+" hasta "+App.getDestinoDe(id)+"</div></html>");
+		JButton ver = new JButton("Ver Incidencias");
+		JButton agregar = new JButton("Nueva Incidencia");
+		JPanel botonera = new JPanel();
+		
+		eventoVerIncidenciasCamino.configurar(id);
+		ver.addActionListener(eventoVerIncidenciasCamino);
+		eventoNuevaIncidencia.configurar(id);
+		agregar.addActionListener(eventoNuevaIncidencia);
+		
+		GridLayout gl = new GridLayout(2,0);
+		gl.setVgap(5);
+		GridLayout glb = new GridLayout(0,2);
+		glb.setHgap(10);
+		glb.setVgap(15);
+		botonera.setLayout(glb);
+		Container c = ventana.getContentPane();
+		c.setLayout(gl);
+		botonera.setLayout(glb);
+		botonera.add(ver);
+		botonera.add(agregar);
+		c.add(texto);
+		c.add(botonera);
+		
+		ventana.setSize(270, 100);
+		ventana.setLocationRelativeTo(null);
+		ventana.setVisible(true);
+	}
+	
+	public static void nuevaIncidencia(int id) {
+		int tam_text = 25;
+		
+		JFrame ventana = new JFrame("Nueva Incidencia");
+		JLabel texto1 = new JLabel("Desc.:");
+		JTextField descripcion = new JTextField(tam_text);
+		JLabel texto2 = new JLabel("Inicio:");
+		JTextField dia_inicio = new JTextField(2);
+		JTextField mes_inicio = new JTextField(2);
+		JTextField anio_inicio = new JTextField(4);
+		JLabel texto3 = new JLabel("Fin:");
+		JTextField dia_fin = new JTextField(2);
+		JTextField mes_fin = new JTextField(2);
+		JTextField anio_fin = new JTextField(4);
+		JButton guardar = new JButton("Guardar");
+		JButton cancelar = new JButton("Cancelar");
+		
+		eventoGuardarIncidencia.configurar(id, ventana, descripcion, dia_inicio, mes_inicio, anio_inicio,
+				dia_fin, mes_fin, anio_fin);
+		guardar.addActionListener(eventoGuardarIncidencia);
+		eventoCancelar.configurar(ventana);
+		cancelar.addActionListener(eventoCancelar);
+		
+		JPanel fechas = new JPanel();
+		GridBagConstraints lugar = new GridBagConstraints();
+		fechas.setLayout(new GridBagLayout());
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.gridwidth = 1;
+		lugar.gridheight = 1;
+		fechas.add(texto2, lugar);
+		lugar.gridx = 1;
+		fechas.add(dia_inicio, lugar);
+		lugar.gridx = 2;
+		fechas.add(new JLabel("/"), lugar);
+		lugar.gridx = 3;
+		fechas.add(mes_inicio, lugar);
+		lugar.gridx = 4;
+		fechas.add(new JLabel("/"), lugar);
+		lugar.gridx = 5;
+		fechas.add(anio_inicio, lugar);
+		lugar.gridx = 6;
+		fechas.add(new JPanel());
+		lugar.gridx = 7;
+		fechas.add(texto3, lugar);
+		lugar.gridx = 8;
+		fechas.add(dia_fin, lugar);
+		lugar.gridx = 9;
+		fechas.add(new JLabel("/"), lugar);
+		lugar.gridx = 10;
+		fechas.add(mes_fin, lugar);
+		lugar.gridx = 11;
+		fechas.add(new JLabel("/"), lugar);
+		lugar.gridx = 12;
+		fechas.add(anio_fin, lugar);
+		
+		JPanel botonera = new JPanel();
+		botonera.setLayout(new GridBagLayout());
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.gridwidth = 1;
+		lugar.gridheight = 1;
+		botonera.add(guardar, lugar);
+		lugar.gridx = 1;
+		lugar.gridx = 2;
+		botonera.add(new JPanel(), lugar);
+		lugar.gridx = 3;
+		botonera.add(cancelar, lugar);
+		
+		ventana.setSize(400, 120);
+		ventana.setLocationRelativeTo(null);
+		ventana.getContentPane().setLayout(new GridBagLayout());
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.anchor = lugar.EAST;
+		lugar.gridwidth = 1;
+		lugar.gridheight = 1;
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		ventana.getContentPane().add(texto1, lugar);
+		lugar.gridx = 1;
+		lugar.gridy = 0;
+		lugar.gridwidth = 4;
+		lugar.anchor = lugar.CENTER;
+		ventana.getContentPane().add(descripcion, lugar);
+		lugar.gridx = 0;
+		lugar.gridy = 1;
+		lugar.gridwidth = 5;
+		ventana.getContentPane().add(fechas, lugar);
+		lugar.gridy = 2;
+		ventana.getContentPane().add(botonera, lugar);
+		ventana.setVisible(true);
+	}
+	
+	public static void verIncidencias(int id) {
+		JFrame ventana = new JFrame("Incidencias");
+		JLabel texto = new JLabel ("Elija la incidencia que desea finalizar");
+		JPanel botonera = new JPanel();
+		JScrollPane panelDeslizable = new JScrollPane();
+		panelDeslizable.setBounds(600, 280, 366, 181);
+		String[] columnas = {"ID", "Inicio", "Fin", "Descripción"};
+		DefaultTableModel modelo = new DefaultTableModel(null, columnas);
+		JButton ok = new JButton("Finalizar");
+
+		ventana.setLayout(new GridBagLayout());
+		botonera.setLayout(new GridBagLayout());
+		GridBagConstraints lugar = new GridBagConstraints();
+
+		JTable tabla = new JTable(modelo);
+		tabla.setPreferredScrollableViewportSize(new Dimension(600, 280));
+		panelDeslizable.setViewportView(tabla);
+
+		ventana.setSize(700, 400);
+		ventana.setLocationRelativeTo(null);
+
+		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+		centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+
+		for(int i = 0; i < App.getCantIncidenciasDe(id); i++) {
+			modelo.addRow(App.getFilaIncidenciasDe(id, i));
+		}
+		for(int i = 0; i < 4; i++) {
+			tabla.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+		}
+
+		panelDeslizable.setViewportView(tabla);
+		panelDeslizable.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		panelDeslizable.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		botonera.add(ok, lugar);
+		
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		ventana.getContentPane().add(texto, lugar);
+		lugar.gridy = 1;
+		lugar.weighty = 0.0;
+		lugar.weightx = 0.0;
+		ventana.getContentPane().add(panelDeslizable, lugar);
+		lugar.gridy = 2;
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		ventana.getContentPane().add(botonera, lugar);
+		//ventana.pack();
+		ventana.setVisible(true);
+	}
+	
+	public static void finalizarIncidencia(int id) {
+		JFrame ventana = new JFrame("Finalizar");
+		JLabel texto = new JLabel("Fecha:");
+		JTextField dia = new JTextField(2);
+		JTextField mes = new JTextField(2);
+		JTextField anio = new JTextField(4);
+		JButton ok = new JButton("Ok");
+		
+		JPanel fechas = new JPanel();
+		GridBagConstraints lugar = new GridBagConstraints();
+		fechas.setLayout(new GridBagLayout());
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.gridwidth = 1;
+		lugar.gridheight = 1;
+		fechas.add(texto, lugar);
+		lugar.gridx = 1;
+		fechas.add(dia, lugar);
+		lugar.gridx = 2;
+		fechas.add(new JLabel("/"), lugar);
+		lugar.gridx = 3;
+		fechas.add(mes, lugar);
+		lugar.gridx = 4;
+		fechas.add(new JLabel("/"), lugar);
+		lugar.gridx = 5;
+		fechas.add(anio, lugar);
+		
+		JPanel botonera = new JPanel();
+		botonera.setLayout(new GridBagLayout());
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.gridwidth = 1;
+		lugar.gridheight = 1;
+		botonera.add(ok, lugar);
+		
+		ventana.setSize(400, 120);
+		ventana.setLocationRelativeTo(null);
+		ventana.getContentPane().setLayout(new GridBagLayout());
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.anchor = lugar.EAST;
+		lugar.gridwidth = 1;
+		lugar.gridheight = 1;
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		ventana.getContentPane().add(fechas, lugar);
+		lugar.gridx = 0;
+		lugar.gridy = 1;
+		lugar.gridwidth = 1;
+		ventana.getContentPane().add(botonera, lugar);
 	}
 	
 	public static void sinElementos() {

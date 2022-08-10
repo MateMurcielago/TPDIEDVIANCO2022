@@ -13,6 +13,7 @@ public class Incidencia {
 		this.setId(id);
 		this.setInicio(inicio);
 		this.setDescripcion(descripcion);
+		this.setFin(LocalDate.of(5000, 1, 1));
 	}
 	
 	public Incidencia(int id, LocalDate inicio, LocalDate fin, String descripcion) {

@@ -22,6 +22,8 @@ public class App {
 	private static ArrayList<Linea> lineas = new ArrayList<Linea>();
 	private static ArrayList<Parada> paradas = new ArrayList<Parada>();
 	private static ArrayList<Camino> caminos = new ArrayList<Camino>();
+	private static ArrayList<Incidencia> incidencias = new ArrayList<Incidencia>();
+	
 	public static void main(String[] args) {
 		ScreensManager.PantallaPrincipal();
 	}
@@ -44,6 +46,14 @@ public class App {
 	
 	public static boolean hayCaminos() {
 		if(caminos.isEmpty()) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	public static boolean tieneIncidencias(int id) {
+		if(caminos.stream().filter(c -> c.getId() == id).findFirst().get().getIncidencias().isEmpty()) {
 			return false;
 		} else {
 			return true;
@@ -90,6 +100,20 @@ public class App {
 		caminos.add(new Camino(id + 1, 
 				paradas.stream().filter(p -> p.getId() == id_origen).findFirst().get(),
 				paradas.stream().filter(p -> p.getId() == id_destino).findFirst().get(), distancia));
+	}
+	
+	public static void addIncidencia(int id, String descripcion, LocalDate inicio, LocalDate fin) {
+		int id_inc = 0;
+		caminos.stream().filter(c -> c.getId() == id).findFirst().get()
+			.addIncidencia(new Incidencia(id_inc + 1, inicio, fin, descripcion));
+		incidencias.add(new Incidencia(id_inc + 1, inicio, fin, descripcion));
+	}
+	
+	public static void addIncidencia(int id, String descripcion, LocalDate inicio) {
+		int id_inc = 0;
+		caminos.stream().filter(c -> c.getId() == id).findFirst().get()
+			.addIncidencia(new Incidencia(id_inc + 1, inicio, descripcion));
+		incidencias.add(new Incidencia(id_inc + 1, inicio, descripcion));
 	}
 	
 	public static int getCantLineas() {
@@ -150,6 +174,27 @@ public class App {
 		return fila;
 	}
 	
+	public static int getCantIncidenciasDe(int id) {
+		return caminos.stream().filter(c -> c.getId() == id).findFirst().get().getIncidencias().size();
+	}
+	
+	public static String[] getFilaIncidenciasDe(int id, int i) {
+		String[] fila = {"", "", "", ""};
+		Incidencia aux = caminos.stream().filter(c -> c.getId() == id).findFirst().get().getIncidencias()
+				.get(i);
+		fila[0] = Integer.toString(aux.getId());
+		fila[1] = aux.getInicio().getDayOfMonth() + "/" + aux.getInicio().getMonthValue() + "/"
+				+ aux.getInicio().getYear();
+		if(aux.getFin().getYear() == 5000) {
+			fila[2] = "-";
+		} else {
+			fila[2] = aux.getFin().getDayOfMonth() + "/" + aux.getFin().getMonthValue() + "/"
+					+ aux.getFin().getYear();
+		}
+		fila[3] = aux.getDescripcion();
+		return fila;
+	}
+	
 	public static String direccionDe(int id) {
 		String dir = paradas.stream().filter(p -> p.getId() == id).findFirst().get().getCalle();
 		int num = paradas.stream().filter(p -> p.getId() == id).findFirst().get().getNroCalle();
@@ -164,5 +209,30 @@ public class App {
 		} else {
 			return true;
 		}
+	}
+	
+	public static String getOrigenDe(int id) {
+		return caminos.stream().filter(c -> c.getId() == id).findFirst().get().getOrigen().getCalle() 
+				+ " " +
+				caminos.stream().filter(c -> c.getId() == id).findFirst().get().getOrigen().getNroCalle();
+	}
+	
+	public static String getDestinoDe(int id) {
+		return caminos.stream().filter(c -> c.getId() == id).findFirst().get().getDestino().getCalle() 
+				+ " " +
+				caminos.stream().filter(c -> c.getId() == id).findFirst().get().getDestino().getNroCalle();
+	}
+	
+	public static boolean isFinalizada(int id) {
+		if(incidencias.stream().filter(i -> i.getId() == id).findFirst().get().getFin().getYear() 
+				== 5000) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	public static void finalizar(int id, LocalDate fecha, int id_camino) {
+		
 	}
 }
