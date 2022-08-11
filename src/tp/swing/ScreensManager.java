@@ -29,9 +29,10 @@ import tp.app.App;
 
 public class ScreensManager {
 	//Fuente de menú
-	private static Font fuente = new Font("Audiowide", Font.PLAIN, 18);
+	private static Font fuente = new Font("Showcard Gothic", Font.PLAIN, 18);
 	
 	//Eventos
+	private static EventoAgregarParada eventoAgregarParada = new EventoAgregarParada();
 	private static EventoBotonCaminosPulsado eventoBotonCaminosPulsado =
 			new EventoBotonCaminosPulsado();
 	private static EventoBotonLineasPulsado eventoBotonLineasPulsado = 
@@ -40,6 +41,7 @@ public class ScreensManager {
 			new EventoBotonParadasPulsado();
 	private static EventoCancelar eventoCancelar = new EventoCancelar();
 	private static EventoDetallesCamino eventoDetallesCamino = new EventoDetallesCamino();
+	private static EventoDetallesLinea eventoDetallesLinea = new EventoDetallesLinea();
 	private static EventoGuardarCamino eventoGuardarCamino = new EventoGuardarCamino();
 	private static EventoGuardarIncidencia eventoGuardarIncidencia = new EventoGuardarIncidencia();
 	private static EventoGuardarLinea eventoGuardarLinea = new EventoGuardarLinea();
@@ -50,15 +52,20 @@ public class ScreensManager {
 	private static EventoNuevaParada eventoNuevaParada = new EventoNuevaParada();
 	private static EventoOrigenDestino eventoOrigen = new EventoOrigenDestino(1);
 	private static EventoOrigenDestino eventoDestino = new EventoOrigenDestino(2);
+	private static EventoParadaDirecta eventoParadaDirecta = new EventoParadaDirecta();
 	private static EventoParadasLinea eventoParadasLinea = new EventoParadasLinea();
+	private static EventoPrimeraParada eventoPrimeraParada = new EventoPrimeraParada();
 	private static EventoVerCaminos eventoVerCaminos = new EventoVerCaminos();
 	private static EventoVerIncidenciasCamino eventoVerIncidenciasCamino =
 			new EventoVerIncidenciasCamino();
 	private static EventoVerLineas eventoVerLineas = new EventoVerLineas();
 	private static EventoVerParadas eventoVerParadas = new EventoVerParadas();
+	private static EventoVerParadasDe eventoVerParadasDe = new EventoVerParadasDe();
+	private static EventoVerTrayectos eventoVerTrayectos = new EventoVerTrayectos();
 	
 	public static void PantallaPrincipal() {
 		JFrame ventana = new JFrame("Gestión de Transporte");
+		
 		JPanel botonera = new JPanel();
 		JButton lineas = new JButton("Líneas");
 		JButton paradas = new JButton("Paradas");
@@ -230,7 +237,7 @@ public class ScreensManager {
 		String[] columnas = {"ID", "Tipo", "Nombre", "Color", "Pasaj. Sentados",
 				"Pasaj. Parados", "WiFi", "Aire Acond." };
 		DefaultTableModel modelo = new DefaultTableModel(null, columnas);
-		JButton paradas = new JButton("Paradas");
+		JButton paradas = new JButton("Ok");
 		
 		ventana.setLayout(new GridBagLayout());
 		botonera.setLayout(new GridBagLayout());
@@ -240,8 +247,8 @@ public class ScreensManager {
 		tabla.setPreferredScrollableViewportSize(new Dimension(800, 280));
 		panelDeslizable.setViewportView(tabla);
 		
-		eventoParadasLinea.configurar(tabla);
-		paradas.addActionListener(eventoParadasLinea);
+		eventoDetallesLinea.configurar(tabla);
+		paradas.addActionListener(eventoDetallesLinea);
 		
 		ventana.setSize(900, 400);
 		ventana.setLocationRelativeTo(null);
@@ -256,6 +263,255 @@ public class ScreensManager {
 			tabla.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
 		}
 		
+		panelDeslizable.setViewportView(tabla);
+		panelDeslizable.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		panelDeslizable.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		botonera.add(paradas, lugar);
+		
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		ventana.getContentPane().add(texto, lugar);
+		lugar.gridy = 1;
+		lugar.weighty = 0.0;
+		lugar.weightx = 0.0;
+		ventana.getContentPane().add(panelDeslizable, lugar);
+		lugar.gridy = 2;
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		ventana.getContentPane().add(botonera, lugar);
+		//ventana.pack();
+		ventana.setVisible(true);
+	}
+	
+	public static void detallesLinea(int id) {
+		JFrame ventana = new JFrame("Más detalles");
+		JLabel texto = new JLabel("<html><div style='text-align: center;'>Detalles de la línea "
+				+App.getNombreLinea(id)+"</div></html>");
+		texto.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+		JButton ver = new JButton("Ver Paradas");
+		JButton tray = new JButton("Ver Trayecto");
+		JButton agregar = new JButton("Añadir Parada");
+		JPanel botonera = new JPanel();
+		
+		eventoAgregarParada.configurar(id);
+		agregar.addActionListener(eventoAgregarParada);
+		eventoVerParadasDe.configurar(id);
+		ver.addActionListener(eventoVerParadasDe);
+		eventoVerTrayectos.configurar(id);
+		tray.addActionListener(eventoVerTrayectos);
+		
+		GridLayout gl = new GridLayout(2,0);
+		gl.setVgap(5);
+		GridLayout glb = new GridLayout(0,3);
+		glb.setHgap(10);
+		glb.setVgap(15);
+		botonera.setLayout(glb);
+		Container c = ventana.getContentPane();
+		c.setLayout(gl);
+		botonera.setLayout(glb);
+		botonera.add(ver);
+		botonera.add(tray);
+		botonera.add(agregar);
+		c.add(texto);
+		c.add(botonera);
+		
+		ventana.setSize(450, 100);
+		ventana.setLocationRelativeTo(null);
+		ventana.setVisible(true);
+	}
+	
+	public static void primeraParada(int id) {
+		String aux = JOptionPane.showInputDialog("Ingrese el ID", "");
+		JFrame ventana = new JFrame("Nueva Parada");
+		JLabel texto = new JLabel(App.direccionDe(Integer.valueOf(aux)));
+		JButton ok = new JButton("Ok");
+		JButton cancelar = new JButton("Cancelar");
+		
+		eventoPrimeraParada.configurar(id, Integer.valueOf(aux), ventana);
+		ok.addActionListener(eventoPrimeraParada);
+		eventoCancelar.configurar(ventana);
+		cancelar.addActionListener(eventoCancelar);
+		
+		JPanel botonera = new JPanel();
+		botonera.setLayout(new GridBagLayout());
+		GridBagConstraints lugar = new GridBagConstraints();
+		lugar.gridy = 0;
+		lugar.gridx = 0;
+		lugar.gridwidth = 1;
+		lugar.gridheight = 1;
+		botonera.add(ok, lugar);
+		lugar.gridx = 1;
+		botonera.add(new JPanel(), lugar);
+		lugar.gridx = 2;
+		botonera.add(cancelar, lugar);
+		
+		ventana.getContentPane().setLayout(new GridBagLayout());
+		lugar.gridy = 0;
+		lugar.gridx = 0;
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		ventana.getContentPane().add(texto, lugar);
+		lugar.gridy = 1;
+		ventana.getContentPane().add(botonera, lugar);
+		ventana.setSize(270, 100);
+		ventana.setLocationRelativeTo(null);
+		ventana.setVisible(true);
+	}
+	
+	public static void verParadasDe(int id) {
+		JFrame ventana = new JFrame("Paradas de la línea");
+		JLabel texto = new JLabel ("Todas las paradas de la línea");
+		JPanel botonera = new JPanel();
+		JScrollPane panelDeslizable = new JScrollPane();
+		panelDeslizable.setBounds(600, 280, 366, 181);
+		String[] columnas = {"ID", "N° Parada", "Calle", "N° Calle" };
+		DefaultTableModel modelo = new DefaultTableModel(null, columnas);
+		JButton paradas = new JButton("Paradas");
+
+		ventana.setLayout(new GridBagLayout());
+		botonera.setLayout(new GridBagLayout());
+		GridBagConstraints lugar = new GridBagConstraints();
+
+		JTable tabla = new JTable(modelo);
+		tabla.setPreferredScrollableViewportSize(new Dimension(600, 280));
+		panelDeslizable.setViewportView(tabla);
+
+		ventana.setSize(700, 400);
+		ventana.setLocationRelativeTo(null);
+
+		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+		centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+
+		for(int i = 0; i < App.getCantParadasDe(id); i++) {
+			modelo.addRow(App.getFilaParadasDe(id, i));
+		}
+		for(int i = 0; i < 4; i++) {
+			tabla.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+		}
+
+		panelDeslizable.setViewportView(tabla);
+		panelDeslizable.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		panelDeslizable.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		botonera.add(paradas, lugar);
+		
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		ventana.getContentPane().add(texto, lugar);
+		lugar.gridy = 1;
+		lugar.weighty = 0.0;
+		lugar.weightx = 0.0;
+		ventana.getContentPane().add(panelDeslizable, lugar);
+		lugar.gridy = 2;
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		ventana.getContentPane().add(botonera, lugar);
+		//ventana.pack();
+		ventana.setVisible(true);
+	}
+	
+	public static void paradaDirecta(int id) {
+		String aux = JOptionPane.showInputDialog("Ingrese el ID", "");
+		if(App.caminoDirecto(App.getIDUltimaParada(id), Integer.valueOf(aux))) {
+			JFrame ventana = new JFrame("Nueva Parada");
+			JLabel texto = new JLabel(App.direccionDe(Integer.valueOf(aux)));
+			JLabel texto2 = new JLabel("Duración:");
+			JTextField duracion = new JTextField(4);
+			JButton ok = new JButton("Ok");
+			JButton cancelar = new JButton("Cancelar");
+			
+			eventoParadaDirecta.configurar(id, Integer.valueOf(aux), ventana, duracion);
+			ok.addActionListener(eventoParadaDirecta);
+			eventoCancelar.configurar(ventana);
+			cancelar.addActionListener(eventoCancelar);
+			
+			JPanel botonera = new JPanel();
+			botonera.setLayout(new GridBagLayout());
+			GridBagConstraints lugar = new GridBagConstraints();
+			lugar.gridy = 0;
+			lugar.gridx = 0;
+			lugar.gridwidth = 1;
+			lugar.gridheight = 1;
+			botonera.add(ok, lugar);
+			lugar.gridx = 1;
+			botonera.add(new JPanel(), lugar);
+			lugar.gridx = 2;
+			botonera.add(cancelar, lugar);
+			
+			JPanel dur = new JPanel();
+			dur.setLayout(new GridBagLayout());
+			lugar.gridy = 0;
+			lugar.gridx = 0;
+			lugar.gridwidth = 1;
+			lugar.gridheight = 1;
+			dur.add(texto2, lugar);
+			lugar.gridx = 1;
+			botonera.add(new JPanel(), lugar);
+			lugar.gridx = 2;
+			dur.add(duracion, lugar);
+			
+			ventana.getContentPane().setLayout(new GridBagLayout());
+			lugar.gridy = 0;
+			lugar.gridx = 0;
+			lugar.weighty = 1.0;
+			lugar.weightx = 1.0;
+			ventana.getContentPane().add(texto, lugar);
+			lugar.gridy = 1;
+			ventana.getContentPane().add(dur, lugar);
+			lugar.gridy = 2;
+			ventana.getContentPane().add(botonera, lugar);
+			ventana.setSize(270, 150);
+			ventana.setLocationRelativeTo(null);
+			ventana.setVisible(true);
+		} else {
+			JOptionPane.showMessageDialog(null,"No existe camino directo hacia la parada","",
+					JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
+	public static void verTrayectos(int id) {
+		JFrame ventana = new JFrame("Trayectos de la línea");
+		JLabel texto = new JLabel("Todos los trayectos de la línea");JPanel botonera = new JPanel();
+		JScrollPane panelDeslizable = new JScrollPane();
+		panelDeslizable.setBounds(600, 280, 366, 181);
+		String[] columnas = {"ID", "Origen", "Destino", "Distancia", "Duración"};
+		DefaultTableModel modelo = new DefaultTableModel(null, columnas);
+		JButton paradas = new JButton("Paradas");
+
+		ventana.setLayout(new GridBagLayout());
+		botonera.setLayout(new GridBagLayout());
+		GridBagConstraints lugar = new GridBagConstraints();
+
+		JTable tabla = new JTable(modelo);
+		tabla.setPreferredScrollableViewportSize(new Dimension(600, 280));
+		panelDeslizable.setViewportView(tabla);
+
+		ventana.setSize(750, 400);
+		ventana.setLocationRelativeTo(null);
+
+		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+		centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+
+		for(int i = 0; i < App.getCantTrayectosDe(id); i++) {
+			modelo.addRow(App.getFilaTrayectos(id, i));
+		}
+		for(int i = 0; i < 5; i++) {
+			tabla.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+		}
+
 		panelDeslizable.setViewportView(tabla);
 		panelDeslizable.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		panelDeslizable.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);

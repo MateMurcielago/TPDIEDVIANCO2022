@@ -2,9 +2,12 @@ package tp.db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 
+import tp.app.App;
 import tp.clases.*;
 
 public class DBManager {
@@ -87,8 +90,8 @@ public class DBManager {
 			conn = DriverManager.getConnection(url, user, pass);
 			Statement st = conn.createStatement();
 			if(i.getFin() != null) {
-				st.executeUpdate("INSERT INTO INCIDENCIA VALUES ("+i.getId()+","+inicio+
-						","+fin+","+i.getDescripcion()+","+c.getId()+")");
+				st.executeUpdate("INSERT INTO INCIDENCIA VALUES ("+i.getId()+",'"+inicio+
+						"','"+fin+"','"+i.getDescripcion()+"',"+c.getId()+")");
 			} else {
 				st.executeUpdate("INSERT INTO INCIDENCIA (id,inicio,descripcion,camino_id)"
 						+ " VALUES ("+i.getId()+",'"+inicio+"','"+i.getDescripcion()+"',"
@@ -162,6 +165,104 @@ public class DBManager {
 			Statement st = conn.createStatement();
 			st.executeUpdate("INSERT INTO TRAYECTO VALUES ("+t.getId()+","
 			+t.getCamino().getId()+","+t.getDuracion()+","+l.getId()+")");
+			st.close();
+			conn.close();
+		} catch(ClassNotFoundException e1) {
+			e1.printStackTrace();
+		} catch(SQLException e2) {
+			e2.printStackTrace();
+		}
+	}
+	
+	public static void cargarLineas() {
+		Connection conn = null;
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			conn = DriverManager.getConnection(url, user, pass);
+			Statement st = conn.createStatement();
+			ResultSet res = st.executeQuery("SELECT * FROM LINEA");
+			while(res.next()) {
+				if(res.getString("wifi") != null) {
+					boolean wifi;
+					if(res.getString("wifi").equals("t")) {
+						wifi = true;
+					} else {
+						wifi = false;
+					}
+					boolean aire;
+					if(res.getString("aireacondicionado").equals("t")) {
+						aire = true;
+					} else {
+						aire = false;
+					}
+					App.cargarSuperior(res.getInt("id"), res.getString("nombre"), res.getString("color"), 
+							res.getInt("maxpasajerossentados"), wifi, aire);
+				} else {
+					App.cargarEconomica(res.getInt("id"), res.getString("nombre"), res.getString("color"),
+							res.getInt("maxpasajerossentados"), res.getInt("maxpasajerosparados"));
+				}
+			}
+			st.close();
+			conn.close();
+		} catch(ClassNotFoundException e1) {
+			e1.printStackTrace();
+		} catch(SQLException e2) {
+			e2.printStackTrace();
+		}
+	}
+	
+	public static void cargarParadas() {
+		Connection conn = null;
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			conn = DriverManager.getConnection(url, user, pass);
+			Statement st = conn.createStatement();
+			ResultSet res = st.executeQuery("SELECT * FROM PARADA");
+			while(res.next()) {
+				App.cargarParada(res.getInt("id"), res.getInt("nroparada"), res.getString("calle"), 
+						res.getInt("nrocalle"));
+			}
+			st.close();
+			conn.close();
+		} catch(ClassNotFoundException e1) {
+			e1.printStackTrace();
+		} catch(SQLException e2) {
+			e2.printStackTrace();
+		}
+	}
+	
+	public static void cargarCaminos() {
+		Connection conn = null;
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			conn = DriverManager.getConnection(url, user, pass);
+			Statement st = conn.createStatement();
+			ResultSet res = st.executeQuery("SELECT * FROM CAMINO");
+			while(res.next()) {
+				App.cargarCamino(res.getInt("id"), res.getInt(2), res.getInt(3), 
+						res.getFloat("distancia"));
+			}
+			st.close();
+			conn.close();
+		} catch(ClassNotFoundException e1) {
+			e1.printStackTrace();
+		} catch(SQLException e2) {
+			e2.printStackTrace();
+		}
+	}
+	
+	public static void cargarIncidencias() {
+		Connection conn = null;
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			conn = DriverManager.getConnection(url, user, pass);
+			Statement st = conn.createStatement();
+			ResultSet res = st.executeQuery("SELECT * FROM INCIDENCIA");
+			while(res.next()) {
+				App.cargarIncidencia(res.getInt("id"), res.getString("descripcion"), 
+						LocalDate.parse(res.getString("inicio")), LocalDate.parse(res.getString("fin")),  
+						res.getInt("camino_id"));
+			}
 			st.close();
 			conn.close();
 		} catch(ClassNotFoundException e1) {
