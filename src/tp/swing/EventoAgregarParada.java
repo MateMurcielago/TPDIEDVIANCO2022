@@ -17,15 +17,16 @@ public class EventoAgregarParada implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(App.tieneParadas(id)) {
-			String[] opciones = {"Directo", "Con Escalas", "Cancelar"};
+			/*String[] opciones = {"Directo", "Con Escalas", "Cancelar"};
 			int opcion = JOptionPane.showOptionDialog(null, "¿Qué tipo de línea?", "", 
 					JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, 
 					opciones, opciones[2]);
 			if(opcion == 0) {
-				ScreensManager.paradaDirecta(id);
+				//ScreensManager.paradaDirecta(id);
 			} else if(opcion == 1) {
 			
-			}
+			}*/
+			ScreensManager.agregarParada(id);
 		} else {
 			ScreensManager.primeraParada(id);
 		}

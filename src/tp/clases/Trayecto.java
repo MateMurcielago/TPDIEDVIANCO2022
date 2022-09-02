@@ -2,13 +2,15 @@ package tp.clases;
 
 public class Trayecto {
 	private int id;
-	private Camino camino;
+	private Parada origen;
+	private Parada destino;
 	private float duracion;
 	
-	public Trayecto(int id, Camino camino, float duracion) {
+	public Trayecto(int id, Parada origen, Parada destino, float duracion) {
 		super();
 		this.setId(id);
-		this.setCamino(camino);
+		this.setOrigen(origen);
+		this.setDestino(destino);
 		this.setDuracion(duracion);
 	}
 	
@@ -20,12 +22,20 @@ public class Trayecto {
 		this.id = id;
 	}
 
-	public Camino getCamino() {
-		return camino;
+	public Parada getOrigen() {
+		return origen;
+	}
+	
+	public void setOrigen(Parada origen) {
+		this.origen = origen;
+	}
+	
+	public Parada getDestino() {
+		return destino;
 	}
 
-	public void setCamino(Camino camino) {
-		this.camino = camino;
+	public void setDestino(Parada destino) {
+		this.destino = destino;
 	}
 
 	public float getDuracion() {

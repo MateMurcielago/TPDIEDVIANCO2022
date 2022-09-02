@@ -140,6 +140,23 @@ public class DBManager {
 		}
 	}
 	
+	public static void addLineaCamino(Linea l, Camino c) {
+		Connection conn = null;
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			conn = DriverManager.getConnection(url, user, pass);
+			Statement st = conn.createStatement();
+			st.executeUpdate("INSERT INTO LINEA_CAMINO (id_linea,id_camino)"
+			+" VALUES ("+l.getId()+","+l.getId()+")");
+			st.close();
+			conn.close();
+		} catch(ClassNotFoundException e1) {
+			e1.printStackTrace();
+		} catch(SQLException e2) {
+			e2.printStackTrace();
+		}
+	}
+	
 	public static void addCamino(Camino c) {
 		Connection conn = null;
 		try {
@@ -164,7 +181,7 @@ public class DBManager {
 			conn = DriverManager.getConnection(url, user, pass);
 			Statement st = conn.createStatement();
 			st.executeUpdate("INSERT INTO TRAYECTO VALUES ("+t.getId()+","
-			+t.getCamino().getId()+","+t.getDuracion()+","+l.getId()+")");
+			+t.getOrigen().getId()+","+t.getDestino().getId()+","+t.getDuracion()+","+l.getId()+")");
 			st.close();
 			conn.close();
 		} catch(ClassNotFoundException e1) {

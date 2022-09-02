@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -24,6 +25,8 @@ public class App {
 	private static ArrayList<Camino> caminos = new ArrayList<Camino>();
 	private static ArrayList<Incidencia> incidencias = new ArrayList<Incidencia>();
 	private static ArrayList<Trayecto> trayectos = new ArrayList<Trayecto>();
+	
+	private static ArrayList<Integer> visitados = new ArrayList<Integer>();
 	
 	public static void main(String[] args) {
 		DBManager.cargarLineas();
@@ -336,6 +339,31 @@ public class App {
 		return fila;
 	}
 	
+	public static int getCantCaminosDe(int id) {
+		return lineas.stream().filter(l -> l.getId() == id).findFirst().get().getCaminos().size();
+	}
+	
+	public static String[] getFilaCaminosDe(int id, int i) {
+		String[] fila = {"", "", "", ""};
+		fila[0] = Integer.toString(lineas.stream().filter(l -> l.getId() == id).findFirst().get()
+				.getCaminos().get(i).getId());
+		fila[1] = Integer.toString(lineas.stream().filter(l -> l.getId() == id).findFirst().get()
+				.getCaminos().get(i).getOrigen().getId());
+		fila[2] = Integer.toString(lineas.stream().filter(l -> l.getId() == id).findFirst().get()
+				.getCaminos().get(i).getDestino().getId());
+		fila[3] = Float.toString(lineas.stream().filter(l -> l.getId() == id).findFirst().get()
+				.getCaminos().get(i).getDistancia());
+		return fila;
+	}
+	
+	public static boolean tieneCaminos(int id) {
+		if(lineas.stream().filter(l -> l.getId() == id).findFirst().get().getCaminos().isEmpty()) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
 	public static boolean caminoDirecto(int id_origen, int id_destino) {
 		if(caminos.stream()
 				.filter(c -> c.getOrigen().getId() == id_origen & c.getDestino().getId() == id_destino)
@@ -354,11 +382,13 @@ public class App {
 	
 	public static void AsignarParada(int id_linea, int id_parada, float duracion) {
 		int id = 0;
+		for(int i = 0; i < trayectos.size(); i++) 
+			if(trayectos.get(i).getId() > id) id = trayectos.get(i).getId();
 		lineas.stream().filter(l -> l.getId() == id_linea ).findFirst().get().addParada(
 				paradas.stream().filter(p -> p.getId() == id_parada).findFirst().get());
 		Trayecto aux = new Trayecto(id + 1, 
-				caminos.stream().filter(c -> c.getOrigen().getId() == App.getIDUltimaParada(id_linea) & 
-				c.getDestino().getId() == id_parada).findFirst().get(), duracion);
+				paradas.stream().filter(p -> p.getId() == App.getIDUltimaParada(id_linea)).findFirst().get(),
+				paradas.stream().filter(p -> p.getId() == id_parada).findFirst().get(), duracion);
 		trayectos.add(aux);
 		lineas.stream().filter(l -> l.getId() == id_linea).findFirst().get().addTrayecto(aux);
 	}
@@ -368,16 +398,14 @@ public class App {
 	}
 	
 	public static String[] getFilaTrayectos(int id, int i) {
-		String[] fila = {"", "", "", "", ""};
+		String[] fila = {"", "", "", ""};
 		fila[0] = Integer.toString(lineas.stream().filter(l -> l.getId() == id).findFirst().get()
 				.getRecorrido().get(i).getId());
 		fila[1] = App.direccionDe(lineas.stream().filter(l -> l.getId() == id).findFirst().get()
-				.getRecorrido().get(i).getCamino().getOrigen().getId());
+				.getRecorrido().get(i).getOrigen().getId());
 		fila[2] = App.direccionDe(lineas.stream().filter(l -> l.getId() == id).findFirst().get()
-				.getRecorrido().get(i).getCamino().getDestino().getId());
+				.getRecorrido().get(i).getDestino().getId());
 		fila[3] = Float.toString(lineas.stream().filter(l -> l.getId() == id).findFirst().get()
-				.getRecorrido().get(i).getCamino().getDistancia());
-		fila[4] = Float.toString(lineas.stream().filter(l -> l.getId() == id).findFirst().get()
 				.getRecorrido().get(i).getDuracion());
 		return fila;
 	}
@@ -388,5 +416,31 @@ public class App {
 		} else {
 			return true;
 		}
+	}
+	
+	public static boolean existeCamino(int id_origen, int id_destino, boolean primero) {
+		ArrayList<Camino> aux = (ArrayList<Camino>) caminos.stream().
+				filter(p -> p.getOrigen().getId() == id_origen).collect(Collectors.toList());
+		if(primero) visitados.clear();
+		visitados.add(id_origen);
+		boolean result = false;
+		for(int i = 0; i < aux.size(); i++) {
+			if(aux.isEmpty()) return false;
+			else if(aux.get(i).getDestino().getId() == id_destino) return true;
+			else if(!visitados.contains(aux.get(i).getDestino().getId())) 
+				result = existeCamino(aux.get(i).getDestino().getId(), id_destino, false);
+			if(result == true) return true;
+		}
+		return result;
+	}
+	
+	public static String getDireccionOrigenDe(int id) {
+		return 
+			direccionDe(caminos.stream().filter(c -> c.getId() == id).findFirst().get().getOrigen().getId());
+	}
+	
+	public static String getDireccionDestinoDe(int id) {
+		return
+			direccionDe(caminos.stream().filter(c -> c.getId() == id).findFirst().get().getDestino().getId());
 	}
 }

@@ -29,7 +29,8 @@ import tp.app.App;
 
 public class ScreensManager {
 	//Fuente de menú
-	private static Font fuente = new Font("Showcard Gothic", Font.PLAIN, 18);
+	private static Font fuente = new Font("Audiowide", Font.PLAIN, 18); //Reemplazar con "Showcard Gothic",
+		//si no se cuenta con dicha fuente en la PC (no viene de fábrica)
 	
 	//Eventos
 	private static EventoAgregarParada eventoAgregarParada = new EventoAgregarParada();
@@ -46,6 +47,7 @@ public class ScreensManager {
 	private static EventoGuardarIncidencia eventoGuardarIncidencia = new EventoGuardarIncidencia();
 	private static EventoGuardarLinea eventoGuardarLinea = new EventoGuardarLinea();
 	private static EventoGuardarParada eventoGuardarParada = new EventoGuardarParada();
+	private static EventoNuevaParadaLinea eventoNuevaParadaLinea = new EventoNuevaParadaLinea();
 	private static EventoNuevoCamino eventoNuevoCamino = new EventoNuevoCamino();
 	private static EventoNuevaIncidencia eventoNuevaIncidencia = new EventoNuevaIncidencia();
 	private static EventoNuevaLinea eventoNuevaLinea = new EventoNuevaLinea();
@@ -56,6 +58,7 @@ public class ScreensManager {
 	private static EventoParadasLinea eventoParadasLinea = new EventoParadasLinea();
 	private static EventoPrimeraParada eventoPrimeraParada = new EventoPrimeraParada();
 	private static EventoVerCaminos eventoVerCaminos = new EventoVerCaminos();
+	private static EventoVerCaminosDe eventoVerCaminosDe = new EventoVerCaminosDe();
 	private static EventoVerIncidenciasCamino eventoVerIncidenciasCamino =
 			new EventoVerIncidenciasCamino();
 	private static EventoVerLineas eventoVerLineas = new EventoVerLineas();
@@ -70,7 +73,7 @@ public class ScreensManager {
 		JButton lineas = new JButton("Líneas");
 		JButton paradas = new JButton("Paradas");
 		JButton caminos = new JButton("Caminos");
-		JButton incidencias = new JButton("Incidencias");
+		JButton incidencias = new JButton("Boletería");
 		JLabel texto = new JLabel("<html><div style='text-align: center;'>Bienvenido al "
 		+"Sistema de Gestión de Transporte Público</div></html>"
 				, SwingConstants.CENTER);
@@ -298,7 +301,10 @@ public class ScreensManager {
 		JButton ver = new JButton("Ver Paradas");
 		JButton tray = new JButton("Ver Trayecto");
 		JButton agregar = new JButton("Añadir Parada");
+		JButton agregarCam = new JButton("Añadir Camino");
+		JButton verCam = new JButton("Ver Caminos");
 		JPanel botonera = new JPanel();
+		JPanel botonera2 = new JPanel();
 		
 		eventoAgregarParada.configurar(id);
 		agregar.addActionListener(eventoAgregarParada);
@@ -306,23 +312,32 @@ public class ScreensManager {
 		ver.addActionListener(eventoVerParadasDe);
 		eventoVerTrayectos.configurar(id);
 		tray.addActionListener(eventoVerTrayectos);
+		eventoVerCaminosDe.configurar(id);
+		verCam.addActionListener(eventoVerCaminosDe);
 		
-		GridLayout gl = new GridLayout(2,0);
+		GridLayout gl = new GridLayout(3,0);
 		gl.setVgap(5);
 		GridLayout glb = new GridLayout(0,3);
 		glb.setHgap(10);
 		glb.setVgap(15);
+		GridLayout glb2 = new GridLayout(0,2);
+		glb2.setHgap(5);
+		glb2.setVgap(15);
 		botonera.setLayout(glb);
+		botonera2.setLayout(glb2);
 		Container c = ventana.getContentPane();
 		c.setLayout(gl);
 		botonera.setLayout(glb);
 		botonera.add(ver);
 		botonera.add(tray);
-		botonera.add(agregar);
+		botonera.add(verCam);
+		botonera2.add(agregar);
+		botonera2.add(agregarCam);
 		c.add(texto);
 		c.add(botonera);
+		c.add(botonera2);
 		
-		ventana.setSize(450, 100);
+		ventana.setSize(450, 120);
 		ventana.setLocationRelativeTo(null);
 		ventana.setVisible(true);
 	}
@@ -423,7 +438,66 @@ public class ScreensManager {
 		ventana.setVisible(true);
 	}
 	
-	public static void paradaDirecta(int id) {
+	public static void agregarParada(int id) {
+		String aux = JOptionPane.showInputDialog("Ingrese el ID", "");
+		if(App.existeCamino(App.getIDUltimaParada(id), Integer.valueOf(aux), true)) {
+			JFrame ventana = new JFrame("Nueva Parada");
+			JLabel texto = new JLabel(App.direccionDe(Integer.valueOf(aux)));
+			JLabel texto2 = new JLabel("Duración:");
+			JTextField duracion = new JTextField(4);
+			JButton ok = new JButton("Ok");
+			JButton cancelar = new JButton("Cancelar");
+			
+			eventoNuevaParadaLinea.configurar(id, Integer.valueOf(aux), ventana, duracion);
+			ok.addActionListener(eventoNuevaParadaLinea);
+			eventoCancelar.configurar(ventana);
+			cancelar.addActionListener(eventoCancelar);
+			
+			JPanel botonera = new JPanel();
+			botonera.setLayout(new GridBagLayout());
+			GridBagConstraints lugar = new GridBagConstraints();
+			lugar.gridy = 0;
+			lugar.gridx = 0;
+			lugar.gridwidth = 1;
+			lugar.gridheight = 1;
+			botonera.add(ok, lugar);
+			lugar.gridx = 1;
+			botonera.add(new JPanel(), lugar);
+			lugar.gridx = 2;
+			botonera.add(cancelar, lugar);
+			
+			JPanel dur = new JPanel();
+			dur.setLayout(new GridBagLayout());
+			lugar.gridy = 0;
+			lugar.gridx = 0;
+			lugar.gridwidth = 1;
+			lugar.gridheight = 1;
+			dur.add(texto2, lugar);
+			lugar.gridx = 1;
+			botonera.add(new JPanel(), lugar);
+			lugar.gridx = 2;
+			dur.add(duracion, lugar);
+			
+			ventana.getContentPane().setLayout(new GridBagLayout());
+			lugar.gridy = 0;
+			lugar.gridx = 0;
+			lugar.weighty = 1.0;
+			lugar.weightx = 1.0;
+			ventana.getContentPane().add(texto, lugar);
+			lugar.gridy = 1;
+			ventana.getContentPane().add(dur, lugar);
+			lugar.gridy = 2;
+			ventana.getContentPane().add(botonera, lugar);
+			ventana.setSize(270, 150);
+			ventana.setLocationRelativeTo(null);
+			ventana.setVisible(true);
+		} else {
+			JOptionPane.showMessageDialog(null,"No existe camino hacia la parada","Error",
+					JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
+	public static void paradaDirecta(int id) { //unused
 		String aux = JOptionPane.showInputDialog("Ingrese el ID", "");
 		if(App.caminoDirecto(App.getIDUltimaParada(id), Integer.valueOf(aux))) {
 			JFrame ventana = new JFrame("Nueva Parada");
@@ -487,7 +561,7 @@ public class ScreensManager {
 		JLabel texto = new JLabel("Todos los trayectos de la línea");JPanel botonera = new JPanel();
 		JScrollPane panelDeslizable = new JScrollPane();
 		panelDeslizable.setBounds(600, 280, 366, 181);
-		String[] columnas = {"ID", "Origen", "Destino", "Distancia", "Duración"};
+		String[] columnas = {"ID", "Origen", "Destino", "Duración"};
 		DefaultTableModel modelo = new DefaultTableModel(null, columnas);
 		JButton paradas = new JButton("Paradas");
 
@@ -537,6 +611,76 @@ public class ScreensManager {
 		ventana.getContentPane().add(botonera, lugar);
 		//ventana.pack();
 		ventana.setVisible(true);
+	}
+	
+	public static void verCaminosDe(int id) {
+		JFrame ventana = new JFrame("Caminos de la línea");
+		JLabel texto = new JLabel ("Todos los caminos que recorre la línea");
+		JPanel botonera = new JPanel();
+		JScrollPane panelDeslizable = new JScrollPane();
+		panelDeslizable.setBounds(600, 280, 366, 181);
+		String[] columnas = {"ID", "Origen", "Destino", "Distancia"};
+		DefaultTableModel modelo = new DefaultTableModel(null, columnas);
+		JButton paradas = new JButton("Caminos");
+
+		ventana.setLayout(new GridBagLayout());
+		botonera.setLayout(new GridBagLayout());
+		GridBagConstraints lugar = new GridBagConstraints();
+
+		JTable tabla = new JTable(modelo);
+		tabla.setPreferredScrollableViewportSize(new Dimension(600, 280));
+		panelDeslizable.setViewportView(tabla);
+
+		ventana.setSize(700, 400);
+		ventana.setLocationRelativeTo(null);
+
+		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+		centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+
+		for(int i = 0; i < App.getCantCaminosDe(id); i++) {
+			modelo.addRow(App.getFilaCaminosDe(id, i));
+		}
+		for(int i = 0; i < 4; i++) {
+			tabla.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+		}
+
+		panelDeslizable.setViewportView(tabla);
+		panelDeslizable.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		panelDeslizable.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		botonera.add(paradas, lugar);
+		
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		ventana.getContentPane().add(texto, lugar);
+		lugar.gridy = 1;
+		lugar.weighty = 0.0;
+		lugar.weightx = 0.0;
+		ventana.getContentPane().add(panelDeslizable, lugar);
+		lugar.gridy = 2;
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		ventana.getContentPane().add(botonera, lugar);
+		//ventana.pack();
+		ventana.setVisible(true);
+	}
+	
+	public static void agregarCamino() {
+		String aux = JOptionPane.showInputDialog("Ingrese el ID", "");
+		JFrame ventana = new JFrame("Nuevo Camino");
+		JLabel texto1 = new JLabel("Camino desde");
+		JLabel texto2 = new JLabel(App.getDireccionOrigenDe(Integer.valueOf(aux)));
+		JLabel texto3 = new JLabel("hasta");
+		JLabel texto4 = new JLabel(App.getDireccionDestinoDe(Integer.valueOf(aux)));
+		JTextField duracion = new JTextField(4);
+		JButton ok = new JButton("Ok");
+		JButton cancelar = new JButton("Cancelar");
 	}
 	
 	public static void paradas() {
