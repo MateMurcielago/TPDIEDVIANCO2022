@@ -32,14 +32,17 @@ public class ScreensManager {
 	private static Font fuente = new Font("Audiowide", Font.PLAIN, 18); //Reemplazar con "Showcard Gothic",
 		//si no se cuenta con dicha fuente en la PC (no viene de fábrica)
 	
-	//Eventos
+	//Eventos (demasiados eventos...)
+	private static EventoAgregarCamino eventoAgregarCamino = new EventoAgregarCamino();
 	private static EventoAgregarParada eventoAgregarParada = new EventoAgregarParada();
+	private static EventoBoleteria eventoBoleteria = new EventoBoleteria();
 	private static EventoBotonCaminosPulsado eventoBotonCaminosPulsado =
 			new EventoBotonCaminosPulsado();
 	private static EventoBotonLineasPulsado eventoBotonLineasPulsado = 
 			new EventoBotonLineasPulsado();
 	private static EventoBotonParadasPulsado eventoBotonParadasPulsado =
 			new EventoBotonParadasPulsado();
+	private static EventoBuscarLinea eventoBuscarLinea = new EventoBuscarLinea();
 	private static EventoCancelar eventoCancelar = new EventoCancelar();
 	private static EventoDetallesCamino eventoDetallesCamino = new EventoDetallesCamino();
 	private static EventoDetallesLinea eventoDetallesLinea = new EventoDetallesLinea();
@@ -49,11 +52,14 @@ public class ScreensManager {
 	private static EventoGuardarParada eventoGuardarParada = new EventoGuardarParada();
 	private static EventoNuevaParadaLinea eventoNuevaParadaLinea = new EventoNuevaParadaLinea();
 	private static EventoNuevoCamino eventoNuevoCamino = new EventoNuevoCamino();
+	private static EventoNuevoCaminoLinea eventoNuevoCaminoLinea = new EventoNuevoCaminoLinea();
 	private static EventoNuevaIncidencia eventoNuevaIncidencia = new EventoNuevaIncidencia();
 	private static EventoNuevaLinea eventoNuevaLinea = new EventoNuevaLinea();
 	private static EventoNuevaParada eventoNuevaParada = new EventoNuevaParada();
 	private static EventoOrigenDestino eventoOrigen = new EventoOrigenDestino(1);
 	private static EventoOrigenDestino eventoDestino = new EventoOrigenDestino(2);
+	private static EventoOrigenDestino2 eventoOrigen2 = new EventoOrigenDestino2(1);
+	private static EventoOrigenDestino2 eventoDestino2 = new EventoOrigenDestino2(2);
 	private static EventoParadaDirecta eventoParadaDirecta = new EventoParadaDirecta();
 	private static EventoParadasLinea eventoParadasLinea = new EventoParadasLinea();
 	private static EventoPrimeraParada eventoPrimeraParada = new EventoPrimeraParada();
@@ -81,6 +87,7 @@ public class ScreensManager {
 		lineas.addActionListener(eventoBotonLineasPulsado);
 		paradas.addActionListener(eventoBotonParadasPulsado);
 		caminos.addActionListener(eventoBotonCaminosPulsado);
+		incidencias.addActionListener(eventoBoleteria);
 		GridLayout gl1 = new GridLayout(2,0);
 		gl1.setVgap(5);
 		GridLayout glb = new GridLayout(2,2);
@@ -314,6 +321,8 @@ public class ScreensManager {
 		tray.addActionListener(eventoVerTrayectos);
 		eventoVerCaminosDe.configurar(id);
 		verCam.addActionListener(eventoVerCaminosDe);
+		eventoAgregarCamino.configurar(id);
+		agregarCam.addActionListener(eventoAgregarCamino);
 		
 		GridLayout gl = new GridLayout(3,0);
 		gl.setVgap(5);
@@ -671,16 +680,51 @@ public class ScreensManager {
 		ventana.setVisible(true);
 	}
 	
-	public static void agregarCamino() {
+	public static void agregarCamino(int id) {
 		String aux = JOptionPane.showInputDialog("Ingrese el ID", "");
 		JFrame ventana = new JFrame("Nuevo Camino");
 		JLabel texto1 = new JLabel("Camino desde");
 		JLabel texto2 = new JLabel(App.getDireccionOrigenDe(Integer.valueOf(aux)));
 		JLabel texto3 = new JLabel("hasta");
 		JLabel texto4 = new JLabel(App.getDireccionDestinoDe(Integer.valueOf(aux)));
-		JTextField duracion = new JTextField(4);
 		JButton ok = new JButton("Ok");
 		JButton cancelar = new JButton("Cancelar");
+		
+		eventoNuevoCaminoLinea.configurar(id, Integer.valueOf(aux), ventana);
+		ok.addActionListener(eventoNuevoCaminoLinea);
+		eventoCancelar.configurar(ventana);
+		cancelar.addActionListener(eventoCancelar);
+		
+		JPanel botonera = new JPanel();
+		botonera.setLayout(new GridBagLayout());
+		GridBagConstraints lugar = new GridBagConstraints();
+		lugar.gridy = 0;
+		lugar.gridx = 0;
+		lugar.gridwidth = 1;
+		lugar.gridheight = 1;
+		botonera.add(ok, lugar);
+		lugar.gridx = 1;
+		botonera.add(new JPanel(), lugar);
+		lugar.gridx = 2;
+		botonera.add(cancelar, lugar);
+		
+		ventana.getContentPane().setLayout(new GridBagLayout());
+		lugar.gridy = 0;
+		lugar.gridx = 0;
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		ventana.getContentPane().add(texto1, lugar);
+		lugar.gridy = 1;
+		ventana.getContentPane().add(texto2, lugar);
+		lugar.gridy = 2;
+		ventana.getContentPane().add(texto3, lugar);
+		lugar.gridy = 3;
+		ventana.getContentPane().add(texto4, lugar);
+		lugar.gridy = 4;
+		ventana.getContentPane().add(botonera, lugar);
+		ventana.setSize(270, 150);
+		ventana.setLocationRelativeTo(null);
+		ventana.setVisible(true);
 	}
 	
 	public static void paradas() {
@@ -1320,6 +1364,190 @@ public class ScreensManager {
 		lugar.gridy = 1;
 		lugar.gridwidth = 1;
 		ventana.getContentPane().add(botonera, lugar);
+	}
+	
+	public static void boleteria() {
+		int id_origen = -1;
+		int id_destino = -1;
+		
+		JFrame ventana = new JFrame("Boletería");
+		
+		JButton addOrigen = new JButton("Origen");
+		JButton addDestino = new JButton("Destino");
+		
+		JButton rapido = new JButton("Más Rápido");
+		JButton corto = new JButton("Más Corto");
+		JButton barato = new JButton("Más Barato");
+		
+		JLabel texto1 = new JLabel("<html><div style='text-align: center;'>Bienvenido a "
+		+"la Boletería</div></html>", SwingConstants.CENTER);
+		texto1.setFont(fuente);
+		JLabel texto2 = new JLabel("<html><div style='text-align: center;'>Rellene los requisitos "
+				+"que debe cumplir la línea</div></html>", SwingConstants.CENTER);
+		JLabel texto3 = new JLabel("Desde: -", SwingConstants.CENTER);
+		JLabel texto4 = new JLabel("Hasta: -", SwingConstants.CENTER);
+		
+		eventoOrigen2.configurar(ventana, id_origen, id_destino);
+		addOrigen.addActionListener(eventoOrigen2);
+		eventoOrigen2.configurar(ventana, id_origen, id_destino);
+		addDestino.addActionListener(eventoDestino2);
+		eventoBuscarLinea.configurar(ventana, id_origen, id_destino);
+		rapido.addActionListener(eventoBuscarLinea);
+		corto.addActionListener(eventoBuscarLinea);
+		barato.addActionListener(eventoBuscarLinea);
+		
+		JPanel botonera1 = new JPanel();
+		botonera1.setLayout(new GridBagLayout());
+		GridBagConstraints lugar = new GridBagConstraints();
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.gridwidth = 1;
+		lugar.gridheight = 1;
+		botonera1.add(addOrigen, lugar);
+		lugar.gridx = 1;
+		lugar.gridx = 2;
+		botonera1.add(new JPanel(), lugar);
+		lugar.gridx = 3;
+		botonera1.add(addDestino, lugar);
+		
+		JPanel botonera2 = new JPanel();
+		botonera2.setLayout(new GridBagLayout());
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.gridwidth = 1;
+		lugar.gridheight = 1;
+		botonera2.add(rapido, lugar);
+		lugar.gridx = 1;
+		lugar.gridx = 2;
+		botonera2.add(new JPanel(), lugar);
+		lugar.gridx = 3;
+		botonera2.add(corto, lugar);
+		lugar.gridx = 4;
+		botonera2.add(new JPanel(), lugar);
+		lugar.gridx = 5;
+		botonera2.add(barato, lugar);
+		
+		ventana.setSize(350, 250);
+		ventana.setLocationRelativeTo(null);
+		ventana.getContentPane().setLayout(new GridBagLayout());
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		lugar.gridx =0;
+		lugar.gridy = 0;
+		lugar.gridwidth = 1;
+		lugar.gridheight = 1;
+		ventana.getContentPane().add(texto1, lugar);
+		lugar.gridy = 1;
+		ventana.getContentPane().add(texto2, lugar);
+		lugar.gridy = 2;
+		ventana.getContentPane().add(texto3, lugar);
+		lugar.gridy = 3;
+		ventana.getContentPane().add(texto4, lugar);
+		lugar.gridy = 4;
+		ventana.getContentPane().add(botonera1, lugar);
+		lugar.gridy = 5;
+		ventana.getContentPane().add(botonera2, lugar);
+		ventana.setVisible(true);
+	}
+	
+	public static void boleteria(int id_origen, int id_destino) {
+		JFrame ventana = new JFrame("Boletería");
+		
+		JButton addOrigen = new JButton("Origen");
+		JButton addDestino = new JButton("Destino");
+		
+		JButton rapido = new JButton("Más Rápido");
+		JButton corto = new JButton("Más Corto");
+		JButton barato = new JButton("Más Barato");
+		
+		JLabel texto1 = new JLabel("<html><div style='text-align: center;'>Bienvenido a "
+		+"la Boletería</div></html>", SwingConstants.CENTER);
+		texto1.setFont(fuente);
+		JLabel texto2 = new JLabel("<html><div style='text-align: center;'>Rellene los requisitos "
+				+"que debe cumplir la línea</div></html>", SwingConstants.CENTER);
+		JLabel texto3 = new JLabel();
+		texto3.setAlignmentX(SwingConstants.CENTER);
+		JLabel texto4 = new JLabel();
+		texto4.setAlignmentX(SwingConstants.CENTER);
+		if(id_origen != -1) {
+			texto3.setText("Desde: "+App.direccionDe(id_origen));
+		} else texto3.setText("Desde: -");
+		if(id_destino != -1) texto4.setText("Hasta: "+App.direccionDe(id_destino));
+		else texto4.setText("Hasta: -");
+		
+		eventoOrigen2.configurar(ventana, id_origen, id_destino);
+		addOrigen.addActionListener(eventoOrigen2);
+		eventoDestino2.configurar(ventana, id_origen, id_destino);
+		addDestino.addActionListener(eventoDestino2);
+		eventoBuscarLinea.configurar(ventana, id_origen, id_destino);
+		rapido.addActionListener(eventoBuscarLinea);
+		corto.addActionListener(eventoBuscarLinea);
+		barato.addActionListener(eventoBuscarLinea);
+		
+		JPanel botonera1 = new JPanel();
+		botonera1.setLayout(new GridBagLayout());
+		GridBagConstraints lugar = new GridBagConstraints();
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.gridwidth = 1;
+		lugar.gridheight = 1;
+		botonera1.add(addOrigen, lugar);
+		lugar.gridx = 1;
+		lugar.gridx = 2;
+		botonera1.add(new JPanel(), lugar);
+		lugar.gridx = 3;
+		botonera1.add(addDestino, lugar);
+		
+		JPanel botonera2 = new JPanel();
+		botonera2.setLayout(new GridBagLayout());
+		lugar.gridx = 0;
+		lugar.gridy = 0;
+		lugar.gridwidth = 1;
+		lugar.gridheight = 1;
+		botonera2.add(rapido, lugar);
+		lugar.gridx = 1;
+		lugar.gridx = 2;
+		botonera2.add(new JPanel(), lugar);
+		lugar.gridx = 3;
+		botonera2.add(corto, lugar);
+		lugar.gridx = 4;
+		botonera2.add(new JPanel(), lugar);
+		lugar.gridx = 5;
+		botonera2.add(barato, lugar);
+		
+		ventana.setSize(350, 250);
+		ventana.setLocationRelativeTo(null);
+		ventana.getContentPane().setLayout(new GridBagLayout());
+		lugar.weighty = 1.0;
+		lugar.weightx = 1.0;
+		lugar.gridx =0;
+		lugar.gridy = 0;
+		lugar.gridwidth = 1;
+		lugar.gridheight = 1;
+		ventana.getContentPane().add(texto1, lugar);
+		lugar.gridy = 1;
+		ventana.getContentPane().add(texto2, lugar);
+		lugar.gridy = 2;
+		ventana.getContentPane().add(texto3, lugar);
+		lugar.gridy = 3;
+		ventana.getContentPane().add(texto4, lugar);
+		lugar.gridy = 4;
+		ventana.getContentPane().add(botonera1, lugar);
+		lugar.gridy = 5;
+		ventana.getContentPane().add(botonera2, lugar);
+		ventana.setVisible(true);
+	}
+	
+	public static void boleto(int id, int id_origen, int id_destino) {
+		JFrame ventana = new JFrame("Boleto");
+		JLabel texto1 = new JLabel("Línea: "+App.getNombreDe(id), SwingConstants.CENTER);
+		JLabel texto2 = new JLabel("Origen: "+App.direccionDe(id_origen), SwingConstants.CENTER);
+		JLabel texto3 = new JLabel("Destino: "+App.direccionDe(id_destino), SwingConstants.CENTER);
+		JLabel texto4 = new JLabel("Duración: "+App.getDuracionDe(id, id_origen, id_destino), 
+				SwingConstants.CENTER);
+		JLabel texto5 = new JLabel("Distancia: "+App.getDistanciaDe(id, id_origen, id_destino), 
+				SwingConstants.CENTER);
+		JLabel texto6 = new JLabel("Precio: $", SwingConstants.CENTER);
 	}
 	
 	public static void sinElementos() {

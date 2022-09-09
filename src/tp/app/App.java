@@ -25,6 +25,7 @@ public class App {
 	private static ArrayList<Camino> caminos = new ArrayList<Camino>();
 	private static ArrayList<Incidencia> incidencias = new ArrayList<Incidencia>();
 	private static ArrayList<Trayecto> trayectos = new ArrayList<Trayecto>();
+	private static float montoBase = 50f;
 	
 	private static ArrayList<Integer> visitados = new ArrayList<Integer>();
 	
@@ -347,9 +348,9 @@ public class App {
 		String[] fila = {"", "", "", ""};
 		fila[0] = Integer.toString(lineas.stream().filter(l -> l.getId() == id).findFirst().get()
 				.getCaminos().get(i).getId());
-		fila[1] = Integer.toString(lineas.stream().filter(l -> l.getId() == id).findFirst().get()
+		fila[1] = direccionDe(lineas.stream().filter(l -> l.getId() == id).findFirst().get()
 				.getCaminos().get(i).getOrigen().getId());
-		fila[2] = Integer.toString(lineas.stream().filter(l -> l.getId() == id).findFirst().get()
+		fila[2] = direccionDe(lineas.stream().filter(l -> l.getId() == id).findFirst().get()
 				.getCaminos().get(i).getDestino().getId());
 		fila[3] = Float.toString(lineas.stream().filter(l -> l.getId() == id).findFirst().get()
 				.getCaminos().get(i).getDistancia());
@@ -391,6 +392,11 @@ public class App {
 				paradas.stream().filter(p -> p.getId() == id_parada).findFirst().get(), duracion);
 		trayectos.add(aux);
 		lineas.stream().filter(l -> l.getId() == id_linea).findFirst().get().addTrayecto(aux);
+	}
+	
+	public static void AsignarCamino(int id_linea, int id_camino) {
+		lineas.stream().filter(l -> l.getId() == id_linea).findFirst().get().addCamino(
+				caminos.stream().filter(c -> c.getId() == id_camino).findFirst().get());
 	}
 	
 	public static int getCantTrayectosDe(int id) {
@@ -442,5 +448,100 @@ public class App {
 	public static String getDireccionDestinoDe(int id) {
 		return
 			direccionDe(caminos.stream().filter(c -> c.getId() == id).findFirst().get().getDestino().getId());
+	}
+	
+	public static int boleto(int id_origen, int id_destino, int opcion) {
+		ArrayList<Linea> bolsa = new ArrayList<Linea>();
+		for(int i = 0; i < lineas.size(); i++) {
+			if(tieneALaParada(lineas.get(i).getId(), id_origen) && 
+					tieneALaParada(lineas.get(i).getId(), id_destino)) {
+				if(bolsa.get(i).existeCaminoEntreParadas(id_origen, id_destino)) bolsa.add(lineas.get(i));
+			}
+		}
+		if(bolsa.isEmpty()) {
+			return -1;
+		} else if(bolsa.size() == 1) {
+			return bolsa.get(0).getId();
+		} else if(opcion == 0) {
+			return lineaMasRapida(bolsa, id_origen, id_destino);
+		} else if(opcion == 1) {
+			return lineaMasCorta(bolsa, id_origen, id_destino);
+		} else if(opcion == 2) {
+			return lineaMasBarata(bolsa, id_origen, id_destino);
+		}
+		return -1;
+	}
+	
+	public static int lineaMasRapida(ArrayList<Linea> bolsa, int id_origen, int id_destino) {
+		float duracion = 0;
+		int id = -1;
+		for(int i = 0; i < bolsa.size(); i++) {
+			if(duracion == 0 || bolsa.get(i).getDuracionTrayecto(id_origen, id_destino) < duracion) {
+				duracion = bolsa.get(i).getDuracionTrayecto(id_origen, id_destino);
+				id = bolsa.get(i).getId();
+			}
+		}
+		return id;
+	}
+	
+	public static int lineaMasCorta(ArrayList<Linea> bolsa, int id_origen, int id_destino) {
+		float distancia = 0;
+		int id = -1;
+		for(int i = 0; i < bolsa.size(); i++) {
+			if(distancia == 0 || bolsa.get(i).getDistanciaEntre(id_origen, id_destino) < distancia) {
+				distancia = bolsa.get(i).getDistanciaEntre(id_origen, id_destino);
+				id = bolsa.get(i).getId();
+			}
+		}
+		return id;
+	}
+	
+	public static int lineaMasBarata(ArrayList<Linea> bolsa, int id_origen, int id_destino) {
+		int id = -1;
+		float precio = 0;
+		for(int i = 0; i < bolsa.size(); i++) {
+			if(precio == 0 || bolsa.get(i).getPrecioBoleto(id_origen, id_destino) < precio) {
+				precio = bolsa.get(i).getPrecioBoleto(id_origen, id_destino);
+				id = bolsa.get(i).getId();
+			}
+		}
+		return id;
+	}
+	
+	public static boolean tieneALaParada(int id_linea, int id_parada) {
+		if(lineas.stream().filter(l -> l.getId() == id_linea).findFirst().get()
+				.tieneLaParada(id_parada)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public static float montoBase() {
+		return montoBase;
+	}
+	
+	public static float getPrecioBoletoDe(int id, int id_origen, int id_destino) {
+		return lineas.stream().filter(l -> l.getId() == id).findFirst().get().
+				getPrecioBoleto(id_origen, id_destino);
+	}
+	
+	public static String getNombreDe(int id) {
+		return lineas.stream().filter(l -> l.getId() == id).findFirst().get().getNombre();
+	}
+	
+	public static float getDuracionDe(int id, int id_origen, int id_destino) {
+		return lineas.stream().filter(l -> l.getId() == id).findFirst().get().
+				getDuracionTrayecto(id_origen, id_destino);
+	}
+	
+	public static float getDistanciaDe(int id, int id_origen, int id_destino) {
+		return lineas.stream().filter(l -> l.getId() == id).findFirst().get().
+				getDistanciaEntre(id_origen, id_destino);
+	}
+	
+	public static float getPrecioDe(int id, int id_origen, int id_destino) {
+		return lineas.stream().filter(l -> l.getId() == id).findFirst().get().
+				getPrecioBoleto(id_origen, id_destino);
 	}
 }

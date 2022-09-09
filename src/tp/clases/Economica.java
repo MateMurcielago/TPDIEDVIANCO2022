@@ -1,5 +1,7 @@
 package tp.clases;
 
+import tp.app.App;
+
 public class Economica extends Linea {
 	private int maxPasajerosParados;
 	
@@ -20,5 +22,12 @@ public class Economica extends Linea {
 
 	public void setMaxPasajerosParados(int maxPasajerosParados) {
 		this.maxPasajerosParados = maxPasajerosParados;
+	}
+	
+	@Override
+	public float getPrecioBoleto(int id_origen, int id_destino) {
+		float precio = this.getDistanciaEntre(id_origen, id_destino) * App.montoBase();
+		precio += (precio * 2)/100;
+		return precio;
 	}
 }
